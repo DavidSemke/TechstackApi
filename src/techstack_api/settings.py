@@ -29,6 +29,7 @@ ALLOWED_HOSTS = [*INTERNAL_IPS]
 
 INSTALLED_APPS = [
     # My apps
+    "apps.core",
     "apps.posts",
     # Django apps
     'django.contrib.admin',
