@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     # My apps
     "apps.core",
     "apps.posts",
+    "apps.profiles",
     # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
