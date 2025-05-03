@@ -33,6 +33,8 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.posts",
     "apps.profiles",
+    # Third party apps
+    "rest_framework",
     # Django apps
     "django.contrib.admin",
     "django.contrib.auth",
