@@ -18,4 +18,6 @@ class UserFactory(DjangoModelFactory):
     username = Faker("name")
     password = Password("password")
     email = Faker("email")
-    profile = RelatedFactory(ProfileFactory, factory_related_name="user")
+    profile = RelatedFactory(
+        ProfileFactory, factory_related_name="user", followers=User.objects.all()
+    )
