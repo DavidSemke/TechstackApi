@@ -45,26 +45,29 @@ class Post(models.Model):
     def clean(self):
         super().clean()
 
-        tag_count = self.tags.count()
-        max_tag_count = 5
-
         if self.publish_date:
-            if not self.thumbnail or not self.content or not self.tags:
-                raise ValidationError(
-                    "A published post must have a thumbnail, content, and tags."
-                )
+            if not self.thumbnail:
+                raise ValidationError("A published post must have a thumbnail.")
 
-            min_tag_count = 1
+            if not self.content:
+                raise ValidationError("A published post must have content.")
 
-            if tag_count < min_tag_count:
-                raise ValidationError(
-                    f"A published post must have at least {min_tag_count} tag(s)."
-                )
+        # if self.id is not None:
+        #     tag_count = self.tags.count()
+        #     max_tag_count = 5
 
-        if tag_count > max_tag_count:
-            raise ValidationError(
-                f"A post must not have more than {max_tag_count} tag(s)."
-            )
+        #     if self.publish_date:
+        #         min_tag_count = 1
+
+        #         if tag_count < min_tag_count:
+        #             raise ValidationError(
+        #                 f"A published post must have at least {min_tag_count} tag(s)."
+        #             )
+
+        #     if tag_count > max_tag_count:
+        #         raise ValidationError(
+        #             f"A post must not have more than {max_tag_count} tag(s)."
+        #         )
 
     def save(self, *args, **kwargs):
         self.full_clean()
