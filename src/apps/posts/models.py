@@ -35,7 +35,7 @@ class Post(models.Model):
         on_delete=models.SET_NULL,
         related_name="posts_created",
     )
-    publish_date = models.DateField(null=True)
+    publish_date = models.DateField(null=True, blank=True)
     last_modified_date = models.DateField(auto_now=True)
     content = models.CharField(
         max_length=3000, blank=True, validators=[MinLengthValidator(500)]
