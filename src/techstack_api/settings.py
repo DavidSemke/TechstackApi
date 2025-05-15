@@ -30,6 +30,7 @@ ALLOWED_HOSTS = [*INTERNAL_IPS]
 
 INSTALLED_APPS = [
     # My apps
+    "apps.commando",
     "apps.core",
     "apps.posts",
     "apps.profiles",
