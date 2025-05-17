@@ -1,0 +1,11 @@
+from rest_framework import serializers
+
+from .models import Profile
+
+
+class ProfileSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.ReadOnlyField(source="user.username")
+
+    class Meta:
+        model = Profile
+        fields = ["owner", "pic", "bio", "followers"]

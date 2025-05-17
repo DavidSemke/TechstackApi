@@ -19,5 +19,6 @@ from django.urls import include, path
 
 urlpatterns = [
     path("", include("apps.core.urls")),
+    path("profiles/", include("apps.profiles.urls")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
 ]
