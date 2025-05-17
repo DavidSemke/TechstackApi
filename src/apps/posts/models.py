@@ -113,6 +113,7 @@ class Reaction(models.Model):
         on_delete=models.CASCADE,
         related_name="reactions_created",
     )
+    create_date = models.DateField(auto_now_add=True)
     type = models.CharField(max_length=1, choices=ReactionType)
 
     # Either a post or a comment is the reaction target
