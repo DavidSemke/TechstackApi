@@ -1,26 +1,26 @@
-from rest_framework import permissions as p
+from rest_framework import permissions as perms
 
 
-class ReadOnly(p.BasePermission):
+class ReadOnly(perms.BasePermission):
     def has_permission(self, request, view):
-        return request.method in p.SAFE_METHODS
+        return request.method in perms.SAFE_METHODS
 
 
-class CreateOnly(p.BasePermission):
+class CreateOnly(perms.BasePermission):
     def has_permission(self, request, view):
         return request.method == "POST"
 
 
-class UpdateOnly(p.BasePermission):
+class UpdateOnly(perms.BasePermission):
     def has_permission(self, request, view):
         return request.method in ("PUT", "PATCH")
 
 
-class DeleteOnly(p.BasePermission):
+class DeleteOnly(perms.BasePermission):
     def has_permission(self, request, view):
         return request.method == "DELETE"
 
 
-class IsOwner(p.BasePermission):
+class IsOwner(perms.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.owner == request.user

@@ -1,7 +1,7 @@
-from rest_framework import permissions as p
+from rest_framework import permissions as perms
 from rest_framework import viewsets
 
-from ..core import permissions as my_p
+from ..core import permissions as my_perms
 from .models import Profile
 from .serializers import ProfileSerializer
 
@@ -14,7 +14,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     # Only a profile's owner can edit the profile.
     # Profile creation/deletion is disabled.
     permission_classes = [
-        p.IsAuthenticatedOrReadOnly,
-        my_p.IsOwner | my_p.ReadOnly,
-        my_p.UpdateOnly | my_p.ReadOnly,
+        perms.IsAuthenticatedOrReadOnly,
+        my_perms.IsOwner | my_perms.ReadOnly,
+        my_perms.UpdateOnly | my_perms.ReadOnly,
     ]
