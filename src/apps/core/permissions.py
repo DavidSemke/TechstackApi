@@ -18,7 +18,7 @@ class IsNotCreating(p.BasePermission):
 
 
 class IsNotDeleting(p.BasePermission):
-    def has_object_permission(self, request, view, obj):
+    def has_permission(self, request, view):
         if request.method in p.SAFE_METHODS:
             return True
 
