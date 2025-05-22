@@ -1,7 +1,7 @@
 from rest_framework import permissions as perms
 from rest_framework import viewsets
 
-from ..core import permissions as my_perms
+from ..core import permissions as core_perms
 from .models import Profile
 from .serializers import ProfileSerializer
 
@@ -15,6 +15,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
     # Profile creation/deletion is disabled.
     permission_classes = [
         perms.IsAuthenticatedOrReadOnly,
-        my_perms.IsOwner | my_perms.ReadOnly,
-        my_perms.UpdateOnly | my_perms.ReadOnly,
+        core_perms.IsOwner | core_perms.ReadOnly,
+        core_perms.UpdateOnly | core_perms.ReadOnly,
     ]
