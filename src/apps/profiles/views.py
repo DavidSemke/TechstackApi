@@ -15,7 +15,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
     # Profile creation/deletion is disabled.
     permission_classes = [
         p.IsAuthenticatedOrReadOnly,
-        my_p.IsOwnerOrReadOnly,
-        my_p.IsNotCreating,
-        my_p.IsNotDeleting,
+        my_p.IsOwner | my_p.ReadOnly,
+        my_p.UpdateOnly | my_p.ReadOnly,
     ]
