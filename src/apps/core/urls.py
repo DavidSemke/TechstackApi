@@ -1,10 +1,10 @@
-from django.urls import include, path
 from rest_framework import routers
 
 from .views import GroupViewSet, UserViewSet
 
-router = routers.DefaultRouter()
+router = routers.SimpleRouter()
 router.register(r"users", UserViewSet)
 router.register(r"groups", GroupViewSet)
 
-urlpatterns = [path("", include(router.urls))]
+# Non-default paths only
+urlpatterns = router.urls

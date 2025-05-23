@@ -16,9 +16,20 @@ Including another URLconf
 """
 
 from django.urls import include, path
+from rest_framework import routers
+
+import apps.posts.views as posts_views
+import apps.profiles.views as profiles_views
+
+default_router = routers.DefaultRouter()
+default_router.register(r"profiles", profiles_views.ProfileViewSet)
+(default_router.register(r"posts", posts_views.PostViewSet),)
+default_router.register(r"tags", posts_views.TagViewSet)
+default_router.register(r"comments", posts_views.CommentViewSet)
+default_router.register(r"reactions", posts_views.ReactionViewSet)
 
 urlpatterns = [
+    path("", include(default_router.urls)),
     path("", include("apps.core.urls")),
-    path("profiles/", include("apps.profiles.urls")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
 ]
