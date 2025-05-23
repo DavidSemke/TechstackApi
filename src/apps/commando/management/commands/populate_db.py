@@ -2,6 +2,7 @@ import random
 
 from decouple import config
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
 from ....core.model_factories import UserFactory
@@ -58,7 +59,21 @@ class Command(BaseCommand):
             password=config("ADMIN_PASSWORD"),
         )
 
-        return [UserFactory() for _ in range(count)]
+        # Create groups if absent
+        author_group, _ = Group.objects.get_or_create(name="author")
+        commenter_group, _ = Group.objects.get_or_create(name="commenter")
+        moderator_group, _ = Group.objects.get_or_create(name="moderator")
+
+        regular_users = []
+
+        for _ in range(count):
+            user = UserFactory()
+            # UserFactory mutes post_save signal.
+            # Otherwise, commenter group is assigned automatically.
+            user.groups.add(author_group, commenter_group, moderator_group)
+            regular_users.append(user)
+
+        return regular_users
 
     def _insert_tags(self, count):
         if count < 0:
