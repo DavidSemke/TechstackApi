@@ -43,7 +43,7 @@ class Post(models.Model):
     content = models.CharField(
         max_length=3000, blank=True, validators=[MinLengthValidator(500)]
     )
-    tags = models.ManyToManyField(Tag, related_name="posts")
+    tags = models.ManyToManyField(Tag, related_name="+")
 
     def clean(self):
         super().clean()
