@@ -84,9 +84,10 @@ class Reaction(models.Model):
         constraints = [
             models.CheckConstraint(
                 condition=(
-                    models.Q(post__isnull=True) | models.Q(comment__isnull=True)
+                    (models.Q(post__isnull=True) & models.Q(comment__isnull=False))
+                    | (models.Q(post__isnull=False) & models.Q(comment__isnull=True))
                 ),
-                name="at_most_one_reaction_target",
+                name="exactly_one_reaction_target",
             )
         ]
 
@@ -103,7 +104,7 @@ class Reaction(models.Model):
     type = models.CharField(max_length=1, choices=ReactionType)
 
     # Either a post or a comment is the reaction target
-    # Constraint prevents both from being non-null simultaneously
+    # Constraint prevents both from being non-null or null simultaneously
     post = models.ForeignKey(
         Post, null=True, on_delete=models.CASCADE, related_name="reactions"
     )
