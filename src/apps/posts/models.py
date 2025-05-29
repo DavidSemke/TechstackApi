@@ -88,7 +88,10 @@ class Reaction(models.Model):
                     | (models.Q(post__isnull=False) & models.Q(comment__isnull=True))
                 ),
                 name="exactly_one_reaction_target",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["user", "post", "comment"], name="unique_user_post_comment"
+            ),
         ]
 
     class ReactionType(models.TextChoices):
