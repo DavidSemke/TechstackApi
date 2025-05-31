@@ -41,7 +41,7 @@ class Post(models.Model):
     publish_date = models.DateField(null=True, blank=True)
     last_modified_date = models.DateField(auto_now=True)
     content = models.CharField(
-        max_length=3000, blank=True, validators=[MinLengthValidator(500)]
+        max_length=15000, blank=True, validators=[MinLengthValidator(1500)]
     )
     tags = models.ManyToManyField(Tag, related_name="+")
 
