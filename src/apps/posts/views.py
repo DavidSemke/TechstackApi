@@ -41,6 +41,10 @@ class PostViewSet(viewsets.ModelViewSet):
         ),
     ]
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+        return super().perform_create(serializer)
+
 
 # View/edit comments
 class CommentViewSet(viewsets.ModelViewSet):
@@ -59,6 +63,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         ),
     ]
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+        return super().perform_create(serializer)
+
 
 # View/edit reactions
 class ReactionViewSet(viewsets.ModelViewSet):
@@ -71,3 +79,7 @@ class ReactionViewSet(viewsets.ModelViewSet):
         perms.IsAuthenticatedOrReadOnly,
         core_perms.IsOwner | core_perms.ReadOnly,
     ]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+        return super().perform_create(serializer)
