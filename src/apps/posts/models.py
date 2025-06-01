@@ -40,7 +40,7 @@ class Post(models.Model):
     )
     publish_date = models.DateField(null=True, blank=True)
     last_modified_date = models.DateField(auto_now=True)
-    content = models.CharField(
+    content = models.TextField(
         max_length=18500, blank=True, validators=[MinLengthValidator(1850)]
     )
     tags = models.ManyToManyField(Tag, related_name="+")
@@ -73,7 +73,7 @@ class Comment(models.Model):
         related_name="comments",
     )
     create_date = models.DateField(auto_now_add=True)
-    content = models.CharField(max_length=300, validators=[MinLengthValidator(1)])
+    content = models.TextField(max_length=300, validators=[MinLengthValidator(1)])
     reply_to = models.ForeignKey(
         "self", null=True, on_delete=models.CASCADE, related_name="replies"
     )

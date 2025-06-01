@@ -9,7 +9,7 @@ class Profile(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
     )
     pic = models.URLField(blank=True, validators=[validate_image_url])
-    bio = models.CharField(max_length=300, blank=True)
+    bio = models.TextField(max_length=300, blank=True)
     followers = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="following"
     )
