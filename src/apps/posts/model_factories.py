@@ -20,7 +20,7 @@ class PostFactory(DjangoModelFactory):
 
     title = Faker("text", max_nb_chars=100)
     thumbnail = ""
-    author = Iterator(User.objects.all())
+    owner = Iterator(User.objects.all())
     publish_date = None
     last_modified_date = Faker("date")
     # Will this require a markdown format?
@@ -39,7 +39,7 @@ class CommentFactory(DjangoModelFactory):
     class Meta:
         model = Comment
 
-    author = Iterator(User.objects.all())
+    owner = Iterator(User.objects.all())
     post = Iterator(Post.objects.all())
     create_date = Faker("date")
     content = Faker("text", max_nb_chars=300)
@@ -56,7 +56,7 @@ class ReactionFactory(DjangoModelFactory):
             state="target_comment", comment=Iterator(Comment.objects.all())
         )
 
-    user = Iterator(User.objects.all())
+    owner = Iterator(User.objects.all())
     type = Faker(
         "word",
         ext_word_list=[Reaction.ReactionType.LIKE, Reaction.ReactionType.DISLIKE],

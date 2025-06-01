@@ -32,11 +32,11 @@ class Tag(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=100, validators=[MinLengthValidator(20)])
     thumbnail = models.URLField(blank=True, validators=[validate_image_url])
-    author = models.ForeignKey(
+    owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
         on_delete=models.SET_NULL,
-        related_name="posts_created",
+        related_name="posts_owned",
     )
     publish_date = models.DateField(null=True, blank=True)
     last_modified_date = models.DateField(auto_now=True)
@@ -61,11 +61,11 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(
+    owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
         on_delete=models.SET_NULL,
-        related_name="comments_created",
+        related_name="comments_owned",
     )
     post = models.ForeignKey(
         Post,
@@ -90,7 +90,7 @@ class Reaction(models.Model):
                 name="exactly_one_reaction_target",
             ),
             models.UniqueConstraint(
-                fields=["user", "post", "comment"], name="unique_user_post_comment"
+                fields=["owner", "post", "comment"], name="unique_owner_post_comment"
             ),
         ]
 
@@ -98,10 +98,10 @@ class Reaction(models.Model):
         LIKE = "L", "Like"
         DISLIKE = "D", "Dislike"
 
-    user = models.ForeignKey(
+    owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="reactions_created",
+        related_name="reactions_owned",
     )
     create_date = models.DateField(auto_now_add=True)
     type = models.CharField(max_length=1, choices=ReactionType)

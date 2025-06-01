@@ -10,7 +10,7 @@ class TagSerializer(serials.HyperlinkedModelSerializer):
 
 
 class PostSerializer(serials.HyperlinkedModelSerializer):
-    owner = serials.ReadOnlyField(source="author.username")
+    owner = serials.ReadOnlyField(source="owner.username")
     publish_date = serials.ReadOnlyField()
     tags = serials.StringRelatedField(many=True)
 
@@ -29,7 +29,7 @@ class PostSerializer(serials.HyperlinkedModelSerializer):
 
 
 class CommentSerializer(serials.HyperlinkedModelSerializer):
-    owner = serials.ReadOnlyField(source="author.username")
+    owner = serials.ReadOnlyField(source="owner.username")
 
     class Meta:
         model = app_models.Comment
@@ -37,7 +37,7 @@ class CommentSerializer(serials.HyperlinkedModelSerializer):
 
 
 class ReactionSerializer(serials.HyperlinkedModelSerializer):
-    owner = serials.ReadOnlyField(source="user.username")
+    owner = serials.ReadOnlyField(source="owner.username")
 
     class Meta:
         model = app_models.Reaction

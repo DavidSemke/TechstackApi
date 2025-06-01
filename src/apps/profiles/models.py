@@ -5,7 +5,7 @@ from ..core.validators import validate_image_url
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(
+    owner = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
     )
     pic = models.URLField(blank=True, validators=[validate_image_url])
