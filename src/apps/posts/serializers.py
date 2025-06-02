@@ -78,3 +78,21 @@ class ReactionSerializer(serials.HyperlinkedModelSerializer):
     class Meta:
         model = app_models.Reaction
         fields = ["url", "owner", "type", "post", "comment"]
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+
+        if rep["post"] is not None:
+            target_value = rep["post"]
+            target_type = "post"
+        elif rep["comment"] is not None:
+            target_value = rep["comment"]
+            target_type = "comment"
+
+        # Use 'target' field instead of 'post' or 'comment'
+        rep["target"] = target_value
+        rep["target_type"] = target_type
+        rep.pop("post")
+        rep.pop("comment")
+
+        return rep
