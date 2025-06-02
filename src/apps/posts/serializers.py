@@ -81,6 +81,8 @@ class ReactionSerializer(serials.HyperlinkedModelSerializer):
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
+        # Display 'Like' and 'Dislike' instead of 'L' and 'D'
+        rep["type"] = instance.get_type_display()
 
         if rep["post"] is not None:
             target_value = rep["post"]
