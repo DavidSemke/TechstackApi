@@ -74,26 +74,33 @@ class CommentSerializer(serials.HyperlinkedModelSerializer):
 
 class ReactionSerializer(serials.HyperlinkedModelSerializer):
     owner = serials.ReadOnlyField(source="owner.username")
+    type = serials.SerializerMethodField()
+    target = serials.SerializerMethodField()
+    target_type = serials.SerializerMethodField()
 
     class Meta:
         model = app_models.Reaction
-        fields = ["url", "owner", "type", "post", "comment"]
+        fields = ["url", "owner", "type", "post", "comment", "target", "target_type"]
+
+    def get_type(self, obj):
+        return obj.get_type_display()
+
+    def get_target(self, obj):
+        if obj.post is not None:
+            return self.fields["post"].to_representation(obj.post)
+
+        if obj.comment is not None:
+            return self.fields["comment"].to_representation(obj.comment)
+
+    def get_target_type(self, obj):
+        if obj.post is not None:
+            return "post"
+
+        if obj.comment is not None:
+            return "comment"
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        # Display 'Like' and 'Dislike' instead of 'L' and 'D'
-        rep["type"] = instance.get_type_display()
-
-        if rep["post"] is not None:
-            target_value = rep["post"]
-            target_type = "post"
-        elif rep["comment"] is not None:
-            target_value = rep["comment"]
-            target_type = "comment"
-
-        # Use 'target' field instead of 'post' or 'comment'
-        rep["target"] = target_value
-        rep["target_type"] = target_type
         rep.pop("post")
         rep.pop("comment")
 
