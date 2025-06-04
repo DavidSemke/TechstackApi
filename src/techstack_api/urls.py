@@ -1,35 +1,41 @@
-"""
-URL configuration for techstack_api project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
 from django.urls import include, path
 from rest_framework import routers
 
+import apps.core.views as core_views
 import apps.posts.views as posts_views
 import apps.profiles.views as profiles_views
 
-default_router = routers.DefaultRouter()
-default_router.register(r"profiles", profiles_views.ProfileViewSet)
-(default_router.register(r"posts", posts_views.PostViewSet),)
-default_router.register(r"tags", posts_views.TagViewSet)
-default_router.register(r"comments", posts_views.CommentViewSet)
-default_router.register(r"reactions", posts_views.ReactionViewSet)
+
+class RootRouter(routers.DefaultRouter):
+    root_viewsets = [
+        profiles_views.ProfileViewSet,
+        posts_views.TagViewSet,
+        posts_views.PostViewSet,
+        posts_views.CommentViewSet,
+        posts_views.ReactionViewSet,
+    ]
+
+    def get_api_root_view(self, api_urls=None):
+        api_root_dict = {}
+        list_name = self.routes[0].name
+
+        for prefix, viewset, basename in self.registry:
+            if viewset in self.root_viewsets:
+                api_root_dict[prefix] = list_name.format(basename=basename)
+
+        return self.APIRootView.as_view(api_root_dict=api_root_dict)
+
+
+root_router = RootRouter()
+root_router.register(r"profiles", profiles_views.ProfileViewSet)
+root_router.register(r"tags", posts_views.TagViewSet)
+root_router.register(r"posts", posts_views.PostViewSet)
+root_router.register(r"comments", posts_views.CommentViewSet)
+root_router.register(r"reactions", posts_views.ReactionViewSet)
+root_router.register(r"users", core_views.UserViewSet)
+root_router.register(r"groups", core_views.GroupViewSet)
 
 urlpatterns = [
-    path("", include(default_router.urls)),
-    path("", include("apps.core.urls")),
+    path("v1/", include(root_router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
 ]
