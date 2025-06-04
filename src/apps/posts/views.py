@@ -1,3 +1,4 @@
+from django.db import models
 from rest_framework import permissions as perms
 from rest_framework import viewsets
 
@@ -40,6 +41,14 @@ class PostViewSet(viewsets.ModelViewSet):
             | core_perms.ReadOnly
         ),
     ]
+
+    def get_queryset(self):
+        filter = models.Q(publish_date__isnull=False)
+
+        if self.request.user.is_authenticated:
+            filter |= models.Q(owner=self.request.user)
+
+        return super().get_queryset().filter(filter)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
