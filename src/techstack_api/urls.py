@@ -1,3 +1,4 @@
+from debug_toolbar.toolbar import debug_toolbar_urls
 from django.urls import include, path
 from rest_framework import routers
 
@@ -38,4 +39,4 @@ root_router.register(r"groups", core_views.GroupViewSet)
 urlpatterns = [
     path("v1/", include(root_router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-]
+] + debug_toolbar_urls()
