@@ -2,10 +2,6 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
 
 import apps.core.views as core_views
 import apps.posts.views as posts_views
@@ -42,9 +38,9 @@ root_router.register(r"users", core_views.UserViewSet)
 root_router.register(r"groups", core_views.GroupViewSet)
 
 urlpatterns = [
-    path("api/v1/", include(root_router.urls)),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("admin/", admin.site.urls),
+    path("auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("api/v1/", include(root_router.urls)),
+    path("api/auth/", include("djoser.urls")),
+    path("api/auth/", include("djoser.urls.jwt")),
 ] + debug_toolbar_urls()

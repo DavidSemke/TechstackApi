@@ -29,13 +29,6 @@ INTERNAL_IPS = ["127.0.0.1", "localhost"]
 ALLOWED_HOSTS = [*INTERNAL_IPS]
 
 INSTALLED_APPS = [
-    # My apps
-    "apps.commando",
-    "apps.core",
-    "apps.posts",
-    "apps.profiles",
-    # Third party apps
-    "rest_framework",
     # Django apps
     "django.contrib.admin",
     "django.contrib.auth",
@@ -43,6 +36,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Third party apps
+    "rest_framework",
+    "djoser",
+    # My apps
+    "apps.commando",
+    "apps.core",
+    "apps.posts",
+    "apps.profiles",
 ]
 
 MIDDLEWARE = [
@@ -174,4 +175,8 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ]
+}
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("JWT",),
 }
