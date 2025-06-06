@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
-from factory import Faker, RelatedFactory
+from factory import Faker, LazyFunction, RelatedFactory
 from factory.django import DjangoModelFactory, Password, mute_signals
 
 from ..profiles.model_factories import ProfileFactory
@@ -19,5 +19,7 @@ class UserFactory(DjangoModelFactory):
     password = Password("password")
     email = Faker("email")
     profile = RelatedFactory(
-        ProfileFactory, factory_related_name="owner", followers=User.objects.all()
+        ProfileFactory,
+        factory_related_name="owner",
+        followers=LazyFunction(User.objects.all),
     )
