@@ -11,5 +11,5 @@ class Profile(models.Model):
     pic = models.URLField(blank=True, validators=[validate_image_url])
     bio = models.TextField(max_length=300, blank=True)
     followers = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="following"
+        settings.AUTH_USER_MODEL, related_name="following", blank=True
     )
