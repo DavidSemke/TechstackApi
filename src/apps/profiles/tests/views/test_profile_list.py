@@ -1,0 +1,60 @@
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+
+from ....core.model_factories import UserFactory
+
+
+class ProfileListTest(APITestCase):
+    def setUp(self):
+        # Creating a user automatically creates a profile
+        self.user1 = UserFactory()
+        self.url = reverse("profile-list")
+        return super().setUp()
+
+    def test_get_guest(self):
+        res = self.client.get(self.url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.user1.username, res.data[0]["owner"])
+
+    def test_post_put_patch_delete_guest(self):
+        methods = ["post", "put", "patch", "delete"]
+
+        for method in methods:
+            method_func = getattr(self.client, method)
+
+            with self.assertLogs("django.request", level="WARNING"):
+                res = method_func(self.url)
+
+            self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    # POST = 403 because profiles are automatically created for users and each user is
+    # limited to one profile.
+    def test_post_login(self):
+        tokens = self.client.post(
+            reverse("jwt-create"),
+            {"username": self.user1.username, "password": "password"},
+        ).json()
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+
+        with self.assertLogs("django.request", level="WARNING"):
+            res = self.client.post(self.url)
+
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_put_patch_delete_login(self):
+        tokens = self.client.post(
+            reverse("jwt-create"),
+            {"username": self.user1.username, "password": "password"},
+        ).json()
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+
+        methods = ["put", "patch", "delete"]
+
+        for method in methods:
+            method_func = getattr(self.client, method)
+
+            with self.assertLogs("django.request", level="WARNING"):
+                res = method_func(self.url)
+
+            self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
