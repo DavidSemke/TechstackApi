@@ -8,7 +8,7 @@ from .serializers import ProfileSerializer
 
 # View/edit profiles
 class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.order_by("owner__username")
     serializer_class = ProfileSerializer
     # Anyone can view a profile.
     # Only a profile's owner can edit the profile.
