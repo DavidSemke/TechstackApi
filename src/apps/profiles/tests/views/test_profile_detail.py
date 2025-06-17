@@ -14,6 +14,7 @@ class ProfileDetailTest(APITestCase):
     def test_get_guest(self):
         res = self.client.get(self.url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.user1.username, res.data["owner"])
 
     def test_post_put_patch_delete_guest(self):
         methods = ["post", "put", "patch", "delete"]
