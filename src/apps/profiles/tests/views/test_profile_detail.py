@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from ....core.model_factories import UserFactory
+from ....core.tests import utils as test_utils
 
 
 class ProfileDetailTest(APITestCase):
@@ -14,7 +15,8 @@ class ProfileDetailTest(APITestCase):
     def test_get_guest(self):
         res = self.client.get(self.url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.user1.username, res.data["owner"])
+        profile_id = test_utils.last_url_pk(res.data["url"])
+        self.assertEqual(self.user1.profile.id, profile_id)
 
     def test_post_put_patch_delete_guest(self):
         methods = ["post", "put", "patch", "delete"]
