@@ -33,11 +33,7 @@ class ProfileListTest(APITestCase):
     # POST = 403 because profiles are automatically created for users and each user is
     # limited to one profile.
     def test_post_login(self):
-        tokens = self.client.post(
-            reverse("jwt-create"),
-            {"username": self.user1.username, "password": "password"},
-        ).json()
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        test_utils.jwt_login(self.client, self.user1.username)
 
         with self.assertLogs("django.request", level="WARNING"):
             res = self.client.post(self.url)
@@ -45,11 +41,7 @@ class ProfileListTest(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_put_patch_delete_login(self):
-        tokens = self.client.post(
-            reverse("jwt-create"),
-            {"username": self.user1.username, "password": "password"},
-        ).json()
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        test_utils.jwt_login(self.client, self.user1.username)
 
         methods = ["put", "patch", "delete"]
 

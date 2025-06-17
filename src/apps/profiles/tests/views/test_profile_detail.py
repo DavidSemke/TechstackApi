@@ -31,11 +31,7 @@ class ProfileDetailTest(APITestCase):
 
     def test_post_login(self):
         user2 = UserFactory()
-
-        tokens = self.client.post(
-            reverse("jwt-create"), {"username": user2.username, "password": "password"}
-        ).json()
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        test_utils.jwt_login(self.client, user2.username)
 
         with self.assertLogs("django.request", level="WARNING"):
             res = self.client.post(self.url)
@@ -44,11 +40,7 @@ class ProfileDetailTest(APITestCase):
 
     def test_put_patch_delete_login(self):
         user2 = UserFactory()
-
-        tokens = self.client.post(
-            reverse("jwt-create"), {"username": user2.username, "password": "password"}
-        ).json()
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        test_utils.jwt_login(self.client, user2.username)
 
         methods = ["put", "patch", "delete"]
 
@@ -61,11 +53,7 @@ class ProfileDetailTest(APITestCase):
             self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_post_login_profile_owner(self):
-        tokens = self.client.post(
-            reverse("jwt-create"),
-            {"username": self.user1.username, "password": "password"},
-        ).json()
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        test_utils.jwt_login(self.client, self.user1.username)
 
         with self.assertLogs("django.request", level="WARNING"):
             res = self.client.post(self.url)
@@ -73,11 +61,7 @@ class ProfileDetailTest(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_put_login_profile_owner(self):
-        tokens = self.client.post(
-            reverse("jwt-create"),
-            {"username": self.user1.username, "password": "password"},
-        ).json()
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        test_utils.jwt_login(self.client, self.user1.username)
 
         profile1 = self.user1.profile
         new_bio = "put"
@@ -93,11 +77,7 @@ class ProfileDetailTest(APITestCase):
         self.assertEqual(profile1.bio, new_bio)
 
     def test_patch_login_profile_owner(self):
-        tokens = self.client.post(
-            reverse("jwt-create"),
-            {"username": self.user1.username, "password": "password"},
-        ).json()
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        test_utils.jwt_login(self.client, self.user1.username)
 
         profile1 = self.user1.profile
         new_bio = "patch"
@@ -113,11 +93,7 @@ class ProfileDetailTest(APITestCase):
         self.assertEqual(profile1.bio, new_bio)
 
     def test_delete_login_profile_owner(self):
-        tokens = self.client.post(
-            reverse("jwt-create"),
-            {"username": self.user1.username, "password": "password"},
-        ).json()
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        test_utils.jwt_login(self.client, self.user1.username)
 
         with self.assertLogs("django.request", level="WARNING"):
             res = self.client.delete(self.url)
