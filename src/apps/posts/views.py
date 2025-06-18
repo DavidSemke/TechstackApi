@@ -15,14 +15,15 @@ class TagViewSet(viewsets.ModelViewSet):
 
     # An author can create.
     # A moderator can update/delete.
-    permission_classes = [
-        perms.IsAuthenticatedOrReadOnly,
-        (
-            (app_perms.IsAuthor & core_perms.CreateOnly)
-            | (app_perms.IsModerator & (core_perms.UpdateOnly | core_perms.DeleteOnly))
-            | core_perms.ReadOnly
-        ),
-    ]
+    def get_permissions(self):
+        self.permission_classes = [perms.IsAuthenticatedOrReadOnly]
+
+        if self.action == "create":
+            self.permission_classes += [app_perms.IsAuthor]
+        elif self.action in ("update", "partial_update", "destroy"):
+            self.permission_classes += [app_perms.IsModerator]
+
+        return super().get_permissions()
 
 
 # View/edit posts
@@ -33,14 +34,17 @@ class PostViewSet(viewsets.ModelViewSet):
     # An author can create.
     # An author that owns the post can update/delete.
     # A moderator can update/delete.
-    permission_classes = [
-        perms.IsAuthenticatedOrReadOnly,
-        (
-            (app_perms.IsAuthor & core_perms.IsOwner)
-            | (app_perms.IsModerator & (core_perms.UpdateOnly | core_perms.DeleteOnly))
-            | core_perms.ReadOnly
-        ),
-    ]
+    def get_permissions(self):
+        self.permission_classes = [perms.IsAuthenticatedOrReadOnly]
+
+        if self.action == "create":
+            self.permission_classes += [app_perms.IsAuthor]
+        elif self.action in ("update", "partial_update", "destroy"):
+            self.permission_classes += [
+                (app_perms.IsAuthor & core_perms.IsOwner) | app_perms.IsModerator
+            ]
+
+        return super().get_permissions()
 
     def get_queryset(self):
         filter = models.Q(publish_date__isnull=False)
@@ -63,14 +67,17 @@ class CommentViewSet(viewsets.ModelViewSet):
     # A commenter can create.
     # A commenter that owns the comment can update/delete.
     # A moderator can update/delete.
-    permission_classes = [
-        perms.IsAuthenticatedOrReadOnly,
-        (
-            (app_perms.IsCommenter & core_perms.IsOwner)
-            | (app_perms.IsModerator & (core_perms.UpdateOnly | core_perms.DeleteOnly))
-            | core_perms.ReadOnly
-        ),
-    ]
+    def get_permissions(self):
+        self.permission_classes = [perms.IsAuthenticatedOrReadOnly]
+
+        if self.action == "create":
+            self.permission_classes += [app_perms.IsCommenter]
+        elif self.action in ("update", "partial_update", "destroy"):
+            self.permission_classes += [
+                (app_perms.IsCommenter & core_perms.IsOwner) | app_perms.IsModerator
+            ]
+
+        return super().get_permissions()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -84,10 +91,13 @@ class ReactionViewSet(viewsets.ModelViewSet):
     )
     serializer_class = app_serials.ReactionSerializer
 
-    permission_classes = [
-        perms.IsAuthenticatedOrReadOnly,
-        core_perms.IsOwner | core_perms.ReadOnly,
-    ]
+    def get_permissions(self):
+        self.permission_classes = [perms.IsAuthenticatedOrReadOnly]
+
+        if self.action in ("update", "partial_update", "destroy"):
+            self.permission_classes += [core_perms.IsOwner]
+
+        return super().get_permissions()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
