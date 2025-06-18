@@ -12,7 +12,9 @@ class TagSerializer(serials.HyperlinkedModelSerializer):
 class PostSerializer(serials.HyperlinkedModelSerializer):
     owner = serials.ReadOnlyField(source="owner.username")
     publish_date = serials.ReadOnlyField()
-    tags = serials.StringRelatedField(many=True)
+    tags = serials.SlugRelatedField(
+        many=True, slug_field="title", queryset=app_models.Tag.objects.all()
+    )
     like_count = serials.SerializerMethodField()
     dislike_count = serials.SerializerMethodField()
 
