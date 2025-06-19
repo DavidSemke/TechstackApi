@@ -90,7 +90,14 @@ class Reaction(models.Model):
                 name="exactly_one_reaction_target",
             ),
             models.UniqueConstraint(
-                fields=["owner", "post", "comment"], name="unique_owner_post_comment"
+                fields=["owner", "post"],
+                condition=models.Q(post__isnull=False),
+                name="unique_owner_post",
+            ),
+            models.UniqueConstraint(
+                fields=["owner", "comment"],
+                condition=models.Q(comment__isnull=False),
+                name="unique_owner_comment",
             ),
         ]
 
