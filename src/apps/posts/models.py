@@ -21,7 +21,10 @@ class Tag(models.Model):
         validators=[
             MinLengthValidator(1),
             # Titles can only contain alphanumeric characters and '-'
-            RegexValidator(r"^[-\dA-Za-z]*$"),
+            RegexValidator(
+                r"^[-\dA-Za-z]*$",
+                message="Tag title must only contain letters, numbers, and hyphens.",
+            ),
         ],
     )
 
