@@ -136,10 +136,14 @@ class Reaction(models.Model):
     # Either a post or a comment is the reaction target
     # Constraint prevents both from being non-null or null simultaneously
     post = models.ForeignKey(
-        Post, null=True, on_delete=models.CASCADE, related_name="reactions"
+        Post, null=True, blank=True, on_delete=models.CASCADE, related_name="reactions"
     )
     comment = models.ForeignKey(
-        Comment, null=True, on_delete=models.CASCADE, related_name="reactions"
+        Comment,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="reactions",
     )
 
     def clean(self):
