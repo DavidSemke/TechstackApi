@@ -87,6 +87,13 @@ class Comment(models.Model):
         if not self.post.publish_date:
             raise ValidationError("A comment cannot be made on a private post.")
 
+        if self.reply_to:
+            if self.reply_to == self:
+                raise ValidationError("A comment cannot be a reply to itself.")
+
+            if self.reply_to.reply_to:
+                raise ValidationError("A comment cannot be a reply to a reply.")
+
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
