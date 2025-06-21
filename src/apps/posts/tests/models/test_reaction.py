@@ -9,7 +9,7 @@ from ... import model_factories as posts_factories
 from ... import models as posts_models
 
 
-class PostModelTest(TestCase):
+class ReactionModelTest(TestCase):
     def setUp(self):
         def clean_excluding_thumbnail(self, exclude=None):
             exclude = list(exclude or []) + ["thumbnail"]
