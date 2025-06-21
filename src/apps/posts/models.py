@@ -81,6 +81,16 @@ class Comment(models.Model):
         "self", null=True, on_delete=models.CASCADE, related_name="replies"
     )
 
+    def clean(self):
+        super().clean()
+
+        if not self.post.publish_date:
+            raise ValidationError("A comment cannot be made on a private post.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
 
 class Reaction(models.Model):
     class Meta:
@@ -124,3 +134,13 @@ class Reaction(models.Model):
     comment = models.ForeignKey(
         Comment, null=True, on_delete=models.CASCADE, related_name="reactions"
     )
+
+    def clean(self):
+        super().clean()
+
+        if self.post and not self.post.publish_date:
+            raise ValidationError("A reaction cannot target a private post.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
