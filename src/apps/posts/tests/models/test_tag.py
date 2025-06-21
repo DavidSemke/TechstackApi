@@ -5,7 +5,7 @@ from django.test import TestCase
 from ... import model_factories as posts_factories
 
 
-class PostModelTest(TestCase):
+class TagModelTest(TestCase):
     def test_constraint_lowercase_title(self):
         try:
             posts_factories.TagFactory(title="UPPERCASE")
