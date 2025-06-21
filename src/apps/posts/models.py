@@ -78,7 +78,7 @@ class Comment(models.Model):
     create_date = models.DateField(auto_now_add=True)
     content = models.TextField(max_length=300, validators=[MinLengthValidator(1)])
     reply_to = models.ForeignKey(
-        "self", null=True, on_delete=models.CASCADE, related_name="replies"
+        "self", null=True, blank=True, on_delete=models.CASCADE, related_name="replies"
     )
 
     def clean(self):
