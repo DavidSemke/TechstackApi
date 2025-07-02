@@ -1,16 +1,17 @@
 from rest_framework import serializers as serials
 
+from ..core.serializers import base as base_serials
 from ..core.serializers import mixins as serial_mixins
 from . import models as app_models
 
 
-class TagSerializer(serials.HyperlinkedModelSerializer):
+class TagSerializer(base_serials.HyperlinkedReprnModelSerializer):
     class Meta:
         model = app_models.Tag
         fields = "__all__"
 
 
-class PostSerializer(serials.HyperlinkedModelSerializer):
+class PostSerializer(base_serials.HyperlinkedReprnModelSerializer):
     owner = serials.ReadOnlyField(source="owner.username")
     publish_date = serials.ReadOnlyField()
     tags = serials.SlugRelatedField(
@@ -48,7 +49,7 @@ class PostSerializer(serials.HyperlinkedModelSerializer):
 
 
 class CommentSerializer(
-    serial_mixins.ImmutableFieldsMixin, serials.HyperlinkedModelSerializer
+    serial_mixins.ImmutableFieldsMixin, base_serials.HyperlinkedReprnModelSerializer
 ):
     owner = serials.ReadOnlyField(source="owner.username")
     like_count = serials.SerializerMethodField()
@@ -79,7 +80,7 @@ class CommentSerializer(
         ).count()
 
 
-class ReactionSerializer(serials.HyperlinkedModelSerializer):
+class ReactionSerializer(base_serials.HyperlinkedReprnModelSerializer):
     owner = serials.ReadOnlyField(source="owner.username")
     type = serials.SerializerMethodField()
     target = serials.SerializerMethodField()
