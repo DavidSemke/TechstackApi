@@ -1,6 +1,6 @@
 from rest_framework import serializers as serials
 
-from ..core.serializer_mixins import ImmutableFieldsMixin
+from ..core.serializers import mixins as serial_mixins
 from . import models as app_models
 
 
@@ -47,7 +47,9 @@ class PostSerializer(serials.HyperlinkedModelSerializer):
         ).count()
 
 
-class CommentSerializer(ImmutableFieldsMixin, serials.HyperlinkedModelSerializer):
+class CommentSerializer(
+    serial_mixins.ImmutableFieldsMixin, serials.HyperlinkedModelSerializer
+):
     owner = serials.ReadOnlyField(source="owner.username")
     like_count = serials.SerializerMethodField()
     dislike_count = serials.SerializerMethodField()
