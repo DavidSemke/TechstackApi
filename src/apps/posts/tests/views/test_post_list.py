@@ -97,3 +97,12 @@ class PostListTest(APITestCase):
                 res = method_func(self.url)
 
             self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_post_login_not_author(self):
+        self.user1.groups.remove(self.author_group)
+        test_utils.jwt_login(self.client, self.user1.username)
+
+        with self.assertLogs("django.request", level="WARNING"):
+            res = self.client.post(self.url)
+
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
