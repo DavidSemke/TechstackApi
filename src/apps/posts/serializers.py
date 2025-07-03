@@ -82,34 +82,12 @@ class CommentSerializer(
 
 class ReactionSerializer(base_serials.HyperlinkedReprnModelSerializer):
     owner = serials.ReadOnlyField(source="owner.username")
-    type = serials.SerializerMethodField()
-    target = serials.SerializerMethodField()
-    target_type = serials.SerializerMethodField()
 
     class Meta:
         model = app_models.Reaction
-        fields = ["url", "owner", "type", "post", "comment", "target", "target_type"]
-
-    def get_type(self, obj):
-        return obj.get_type_display()
-
-    def get_target(self, obj):
-        if obj.post is not None:
-            return self.fields["post"].to_representation(obj.post)
-
-        if obj.comment is not None:
-            return self.fields["comment"].to_representation(obj.comment)
-
-    def get_target_type(self, obj):
-        if obj.post is not None:
-            return "post"
-
-        if obj.comment is not None:
-            return "comment"
+        fields = ["url", "owner", "type", "post", "comment"]
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep.pop("post")
-        rep.pop("comment")
-
+        rep["type"] = instance.get_type_display()
         return rep
