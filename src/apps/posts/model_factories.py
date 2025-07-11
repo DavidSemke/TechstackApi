@@ -40,7 +40,7 @@ class CommentFactory(DjangoModelFactory):
         model = Comment
 
     owner = Iterator(User.objects.filter(is_superuser=False))
-    post = Iterator(Post.objects.all())
+    post = Iterator(Post.objects.filter(publish_date__isnull=False))
     create_date = Faker("date")
     content = Faker("text", max_nb_chars=300)
     reply_to = None
@@ -51,7 +51,10 @@ class ReactionFactory(DjangoModelFactory):
         model = Reaction
 
     class Params:
-        target_post = Trait(state="target_post", post=Iterator(Post.objects.all()))
+        target_post = Trait(
+            state="target_post",
+            post=Iterator(Post.objects.filter(publish_date__isnull=False)),
+        )
         target_comment = Trait(
             state="target_comment", comment=Iterator(Comment.objects.all())
         )
