@@ -21,5 +21,5 @@ class UserFactory(DjangoModelFactory):
     profile = RelatedFactory(
         ProfileFactory,
         factory_related_name="owner",
-        followers=LazyFunction(User.objects.all),
+        followers=LazyFunction(lambda: User.objects.filter(is_superuser=False)),
     )
