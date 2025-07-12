@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 
 import requests
 from django.core.exceptions import ValidationError
@@ -6,7 +7,8 @@ from django.core.exceptions import ValidationError
 
 def validate_image_url(url):
     image_exts = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
-    ext = os.path.splitext(url)[1].lower()
+    path = urlparse(url).path
+    ext = os.path.splitext(path)[1].lower()
 
     if ext not in image_exts:
         raise ValidationError("URL does not have a valid image file extension.")
