@@ -23,8 +23,6 @@ class PostFactory(DjangoModelFactory):
     thumbnail = LazyFunction(lambda: core_utils.rand_image_url())
     owner = Iterator(User.objects.filter(is_superuser=False))
     publish_date = Faker("date")
-    last_modified_date = Faker("date")
-    # Will this require a markdown format?
     content = Faker("text", max_nb_chars=3000)
 
     @post_generation
@@ -42,7 +40,6 @@ class CommentFactory(DjangoModelFactory):
 
     owner = Iterator(User.objects.filter(is_superuser=False))
     post = Iterator(Post.objects.filter(publish_date__isnull=False))
-    create_date = Faker("date")
     content = Faker("text", max_nb_chars=300)
     reply_to = None
 
