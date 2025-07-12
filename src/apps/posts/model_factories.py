@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
-from factory import Faker, Iterator, Sequence, Trait, post_generation
+from factory import Faker, Iterator, LazyFunction, Sequence, Trait, post_generation
 from factory.django import DjangoModelFactory
 
+from ..core import utils as core_utils
 from .models import Comment, Post, Reaction, Tag
 
 User = get_user_model()
@@ -19,9 +20,9 @@ class PostFactory(DjangoModelFactory):
         model = Post
 
     title = Faker("text", max_nb_chars=100)
-    thumbnail = ""
+    thumbnail = LazyFunction(lambda: core_utils.rand_image_url())
     owner = Iterator(User.objects.filter(is_superuser=False))
-    publish_date = None
+    publish_date = Faker("date")
     last_modified_date = Faker("date")
     # Will this require a markdown format?
     content = Faker("text", max_nb_chars=3000)
