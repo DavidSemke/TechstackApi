@@ -1,4 +1,3 @@
-import datetime
 from unittest import mock
 
 from django.contrib.auth.models import Group
@@ -29,13 +28,14 @@ class PostListTest(APITestCase):
         self.public_post = posts_factories.PostFactory(
             owner=self.user1,
             thumbnail="https://fake-url.com/media/thumbnail.webp",
-            publish_date=datetime.date.today(),
             tags=[posts_factories.TagFactory()],
         )
 
         self.user2 = core_factories.UserFactory()
         self.user2.groups.add(self.author_group)
-        self.private_post = posts_factories.PostFactory(owner=self.user2)
+        self.private_post = posts_factories.PostFactory(
+            owner=self.user2, thumbnail="", publish_date=None
+        )
 
         self.url = reverse("post-list")
         return super().setUp()

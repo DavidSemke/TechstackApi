@@ -1,4 +1,3 @@
-import datetime
 from unittest import mock
 
 from django.urls import reverse
@@ -26,7 +25,6 @@ class ReactionListTest(APITestCase):
         self.public_post = posts_factories.PostFactory(
             owner=self.user1,
             thumbnail="https://fake-url.com/media/thumbnail.webp",
-            publish_date=datetime.date.today(),
             tags=[posts_factories.TagFactory()],
         )
         self.post_reaction = posts_factories.ReactionFactory(
@@ -54,18 +52,20 @@ class ReactionListTest(APITestCase):
             self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_post_login_target_post(self):
-        test_utils.jwt_login(self.client, self.user1.username)
+        # Create user that has not already reacted to public_post
+        user2 = core_factories.UserFactory()
+        test_utils.jwt_login(self.client, user2.username)
 
         self.assertFalse(
             posts_models.Reaction.objects.filter(
-                owner=self.user1, post=self.public_post
+                owner=user2, post=self.public_post
             ).exists()
         )
         res = self.client.post(self.url, {"post": self.public_post.id, "type": "L"})
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertTrue(
             posts_models.Reaction.objects.filter(
-                owner=self.user1, post=self.public_post
+                owner=user2, post=self.public_post
             ).exists()
         )
 

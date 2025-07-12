@@ -1,4 +1,3 @@
-import datetime
 from unittest import mock
 
 from django.core.exceptions import ValidationError
@@ -26,7 +25,6 @@ class ReactionModelTest(TestCase):
             owner=self.user1,
             thumbnail="https://fake-url.com/media/thumbnail.webp",
             tags=[self.tag1],
-            publish_date=datetime.date.today(),
         )
         self.post_reaction = posts_factories.ReactionFactory(
             owner=self.user1, post=self.post
@@ -49,10 +47,7 @@ class ReactionModelTest(TestCase):
 
     def test_constraint_unique_owner_comment(self):
         comment = posts_factories.CommentFactory(owner=self.user1, post=self.post)
-        posts_factories.ReactionFactory(
-            owner=self.user1,
-            comment=comment,
-        )
+        posts_factories.ReactionFactory(owner=self.user1, comment=comment)
 
         with self.assertRaises(ValidationError) as e:
             posts_factories.ReactionFactory(
@@ -63,12 +58,13 @@ class ReactionModelTest(TestCase):
             self.assertIn("unique_owner_comment", e.messages[0])
 
     def test_post_private(self):
-        private_post = posts_factories.PostFactory()
+        self.post.publish_date = None
+        self.post.save()
 
         with self.assertRaises(ValidationError) as e:
             posts_factories.ReactionFactory(
                 owner=self.user1,
-                post=private_post,
+                post=self.post,
             )
             self.assertEqual(len(e.messages), 1)
             self.assertEqual(e.messages[0], "A reaction cannot target a private post.")

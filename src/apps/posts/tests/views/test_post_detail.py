@@ -1,4 +1,3 @@
-import datetime
 from unittest import mock
 
 from django.contrib.auth.models import Group
@@ -34,7 +33,6 @@ class PostDetailTest(APITestCase):
         self.public_post = posts_factories.PostFactory(
             owner=self.user1,
             thumbnail="https://fake-url.com/media/thumbnail.webp",
-            publish_date=datetime.date.today(),
             tags=self.tags,
         )
         self.public_url = self.get_url(self.public_post.id)
@@ -47,7 +45,9 @@ class PostDetailTest(APITestCase):
         self.assertEqual(self.public_post.id, post_id)
 
     def test_get_guest_private_post(self):
-        private_post = posts_factories.PostFactory(owner=self.user1)
+        private_post = posts_factories.PostFactory(
+            owner=self.user1, thumbnail="", publish_date=None
+        )
 
         with self.assertLogs("django.request", level="WARNING"):
             res = self.client.get(self.get_url(private_post.id))
@@ -69,7 +69,9 @@ class PostDetailTest(APITestCase):
         user2 = core_factories.UserFactory()
         user2.groups.add(self.author_group)
         test_utils.jwt_login(self.client, user2.username)
-        private_post = posts_factories.PostFactory(owner=self.user1)
+        private_post = posts_factories.PostFactory(
+            owner=self.user1, thumbnail="", publish_date=None
+        )
 
         with self.assertLogs("django.request", level="WARNING"):
             res = self.client.get(self.get_url(private_post.id))
@@ -101,7 +103,9 @@ class PostDetailTest(APITestCase):
 
     def test_get_login_private_post_owner(self):
         test_utils.jwt_login(self.client, self.user1.username)
-        private_post = posts_factories.PostFactory(owner=self.user1)
+        private_post = posts_factories.PostFactory(
+            owner=self.user1, thumbnail="", publish_date=None
+        )
 
         res = self.client.get(self.get_url(private_post.id))
         self.assertEqual(res.status_code, status.HTTP_200_OK)

@@ -1,4 +1,3 @@
-import datetime
 from unittest import mock
 
 from django.urls import reverse
@@ -29,7 +28,6 @@ class ReactionDetailTest(APITestCase):
         self.public_post = posts_factories.PostFactory(
             owner=self.user1,
             thumbnail="https://fake-url.com/media/thumbnail.webp",
-            publish_date=datetime.date.today(),
             tags=[posts_factories.TagFactory()],
         )
         self.post_reaction = posts_factories.ReactionFactory(

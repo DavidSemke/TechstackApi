@@ -1,4 +1,3 @@
-import datetime
 from unittest import mock
 
 from django.core.exceptions import ValidationError
@@ -26,18 +25,18 @@ class CommentModelTest(TestCase):
             owner=self.user1,
             thumbnail="https://fake-url.com/media/thumbnail.webp",
             tags=[self.tag1],
-            publish_date=datetime.date.today(),
         )
 
         return super().setUp()
 
     def test_post_private(self):
-        private_post = posts_factories.PostFactory()
+        self.post.publish_date = None
+        self.post.save()
 
         with self.assertRaises(ValidationError) as e:
             posts_factories.CommentFactory(
                 owner=self.user1,
-                post=private_post,
+                post=self.post,
             )
             self.assertEqual(len(e.messages), 1)
             self.assertEqual(e.messages[0], "A reaction cannot target a private post.")

@@ -1,4 +1,3 @@
-import datetime
 from unittest import mock
 
 from django.contrib.auth.models import Group
@@ -33,7 +32,6 @@ class CommentDetailTest(APITestCase):
         self.public_post = posts_factories.PostFactory(
             owner=self.user1,
             thumbnail="https://fake-url.com/media/thumbnail.webp",
-            publish_date=datetime.date.today(),
             tags=[posts_factories.TagFactory()],
         )
         self.comment = posts_factories.CommentFactory(

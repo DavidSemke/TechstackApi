@@ -1,4 +1,3 @@
-import datetime
 from unittest import mock
 
 from django.core.exceptions import ValidationError
@@ -31,7 +30,6 @@ class PostModelTest(TestCase):
         return super().setUp()
 
     def test_thumbnail_empty_on_publish(self):
-        self.post.publish_date = datetime.date.today()
         self.post.thumbnail = ""
 
         try:
@@ -42,7 +40,6 @@ class PostModelTest(TestCase):
             self.assertEqual(e.messages[0], "A published post must have a thumbnail.")
 
     def test_content_empty_on_publish(self):
-        self.post.publish_date = datetime.date.today()
         self.post.content = ""
 
         try:
@@ -53,8 +50,6 @@ class PostModelTest(TestCase):
             self.assertEqual(e.messages[0], "A published post must have content.")
 
     def test_tags_too_few_on_publish(self):
-        self.post.publish_date = datetime.date.today()
-
         try:
             self.post.tags.remove(self.tag1)
             self.fail("Validation error not raised.")
