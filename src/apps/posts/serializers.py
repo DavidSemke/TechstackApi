@@ -8,7 +8,7 @@ from . import models as app_models
 class TagSerializer(base_serials.HyperlinkedReprnModelSerializer):
     class Meta:
         model = app_models.Tag
-        fields = "__all__"
+        fields = ["url", "title"]
 
 
 class PostSerializer(base_serials.HyperlinkedReprnModelSerializer):
