@@ -39,7 +39,7 @@ class CommentModelTest(TestCase):
                 post=self.post,
             )
             self.assertEqual(len(e.messages), 1)
-            self.assertEqual(e.messages[0], "A reaction cannot target a private post.")
+            self.assertEqual(e.messages[0], "A comment cannot target a private post.")
 
     def test_reply_to_self(self):
         comment = posts_factories.CommentFactory(owner=self.user1, post=self.post)

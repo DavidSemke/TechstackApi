@@ -29,14 +29,12 @@ class CommentDetailTest(APITestCase):
         self.commenter_group = Group.objects.create(name="commenter")
         self.user1.groups.add(self.commenter_group)
 
-        self.public_post = posts_factories.PostFactory(
+        self.post = posts_factories.PostFactory(
             owner=self.user1,
             thumbnail="https://fake-url.com/media/thumbnail.webp",
             tags=[posts_factories.TagFactory()],
         )
-        self.comment = posts_factories.CommentFactory(
-            owner=self.user1, post=self.public_post
-        )
+        self.comment = posts_factories.CommentFactory(owner=self.user1, post=self.post)
         self.comment_url = self.get_url(self.comment.id)
         return super().setUp()
 
@@ -45,6 +43,15 @@ class CommentDetailTest(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         comment_id = test_utils.last_url_pk(res.data["url"])
         self.assertEqual(self.comment.id, comment_id)
+
+    def test_get_guest_private_post(self):
+        self.post.publish_date = None
+        self.post.save()
+
+        with self.assertLogs("django.request", level="WARNING"):
+            res = self.client.get(self.comment_url)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_post_put_patch_delete_guest(self):
         methods = ["post", "put", "patch", "delete"]
@@ -57,6 +64,17 @@ class CommentDetailTest(APITestCase):
 
             self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_get_login_private_post(self):
+        user2 = core_factories.UserFactory()
+        test_utils.jwt_login(self.client, user2.username)
+        self.post.publish_date = None
+        self.post.save()
+
+        with self.assertLogs("django.request", level="WARNING"):
+            res = self.client.get(self.comment_url)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_post_login(self):
         test_utils.jwt_login(self.client, self.user1.username)
 
@@ -65,7 +83,7 @@ class CommentDetailTest(APITestCase):
 
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def test_put_patch_delete_login(self):
+    def test_put_patch_delete_login_public_post(self):
         user2 = core_factories.UserFactory()
         user2.groups.add(self.commenter_group)
         test_utils.jwt_login(self.client, user2.username)
@@ -80,7 +98,31 @@ class CommentDetailTest(APITestCase):
 
             self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_put_login_owner(self):
+    def test_get_login_private_post_comment_owner(self):
+        user2 = core_factories.UserFactory()
+        test_utils.jwt_login(self.client, user2.username)
+        private_post_comment = posts_factories.CommentFactory(
+            owner=user2, post=self.post
+        )
+        self.post.publish_date = None
+        self.post.save()
+
+        res = self.client.get(self.get_url(private_post_comment.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_get_login_private_post_owner(self):
+        test_utils.jwt_login(self.client, self.user1.username)
+        user2 = core_factories.UserFactory()
+        private_post_comment = posts_factories.CommentFactory(
+            owner=user2, post=self.post
+        )
+        self.post.publish_date = None
+        self.post.save()
+
+        res = self.client.get(self.get_url(private_post_comment.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_put_login_public_post_comment_owner(self):
         test_utils.jwt_login(self.client, self.user1.username)
 
         new_content = "hello"
@@ -92,7 +134,7 @@ class CommentDetailTest(APITestCase):
         self.comment.refresh_from_db()
         self.assertEqual(self.comment.content, new_content)
 
-    def test_patch_login_owner(self):
+    def test_patch_login_public_post_comment_owner(self):
         test_utils.jwt_login(self.client, self.user1.username)
 
         new_content = "hello"
@@ -104,7 +146,7 @@ class CommentDetailTest(APITestCase):
         self.comment.refresh_from_db()
         self.assertEqual(self.comment.content, new_content)
 
-    def test_delete_login_owner(self):
+    def test_delete_login_public_post_comment_owner(self):
         test_utils.jwt_login(self.client, self.user1.username)
 
         res = self.client.delete(self.comment_url)
@@ -112,6 +154,25 @@ class CommentDetailTest(APITestCase):
 
         with self.assertRaises(posts_models.Comment.DoesNotExist):
             self.comment.refresh_from_db()
+
+    def test_put_patch_delete_login_private_post_comment_owner(self):
+        user2 = core_factories.UserFactory()
+        test_utils.jwt_login(self.client, user2.username)
+        private_post_comment = posts_factories.ReactionFactory(
+            owner=user2, post=self.post
+        )
+        self.post.publish_date = None
+        self.post.save()
+
+        methods = ["put", "patch", "delete"]
+
+        for method in methods:
+            method_func = getattr(self.client, method)
+
+            with self.assertLogs("django.request", level="WARNING"):
+                res = method_func(self.get_url(private_post_comment.id))
+
+            self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_put_patch_delete_login_owner_not_commenter(self):
         self.user1.groups.remove(self.commenter_group)

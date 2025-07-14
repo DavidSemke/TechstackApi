@@ -152,6 +152,11 @@ class Reaction(models.Model):
         if self.post and not self.post.publish_date:
             raise ValidationError("A reaction cannot target a private post.")
 
+        if self.comment and not self.comment.post.publish_date:
+            raise ValidationError(
+                "A reaction cannot target a comment of a private post."
+            )
+
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)

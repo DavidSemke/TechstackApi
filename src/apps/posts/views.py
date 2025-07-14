@@ -79,6 +79,15 @@ class CommentViewSet(viewsets.ModelViewSet):
 
         return super().get_permissions()
 
+    def get_queryset(self):
+        filter = models.Q(post__publish_date__isnull=False)
+
+        if self.request.user.is_authenticated:
+            filter |= models.Q(owner=self.request.user)
+            filter |= models.Q(post__owner=self.request.user)
+
+        return super().get_queryset().filter(filter)
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
         return super().perform_create(serializer)
@@ -98,6 +107,24 @@ class ReactionViewSet(viewsets.ModelViewSet):
             self.permission_classes += [core_perms.IsOwner]
 
         return super().get_permissions()
+
+    def get_queryset(self):
+        post_filter = models.Q(post__isnull=False)
+        comment_filter = models.Q(comment__isnull=False)
+        post_defined_query = models.Q(post__publish_date__isnull=False)
+        comment_defined_query = models.Q(comment__post__publish_date__isnull=False)
+        filter = models.Q()
+
+        if self.request.user.is_authenticated:
+            post_defined_query |= models.Q(post__owner=self.request.user)
+            comment_defined_query |= models.Q(comment__post__owner=self.request.user)
+            filter &= models.Q(owner=self.request.user)
+
+        post_filter &= post_defined_query
+        comment_filter &= comment_defined_query
+        filter |= post_filter | comment_filter
+
+        return super().get_queryset().filter(filter)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

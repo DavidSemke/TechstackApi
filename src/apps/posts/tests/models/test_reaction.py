@@ -68,3 +68,21 @@ class ReactionModelTest(TestCase):
             )
             self.assertEqual(len(e.messages), 1)
             self.assertEqual(e.messages[0], "A reaction cannot target a private post.")
+
+    def test_comment_private(self):
+        private_comment = posts_factories.CommentFactory(
+            owner=self.user1,
+            post=self.post,
+        )
+        self.post.publish_date = None
+        self.post.save()
+
+        with self.assertRaises(ValidationError) as e:
+            posts_factories.ReactionFactory(
+                owner=self.user1,
+                comment=private_comment,
+            )
+            self.assertEqual(len(e.messages), 1)
+            self.assertEqual(
+                e.messages[0], "A reaction cannot target a comment of a private post."
+            )

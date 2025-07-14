@@ -54,7 +54,8 @@ class ReactionFactory(DjangoModelFactory):
             post=Iterator(Post.objects.filter(publish_date__isnull=False)),
         )
         target_comment = Trait(
-            state="target_comment", comment=Iterator(Comment.objects.all())
+            state="target_comment",
+            comment=Iterator(Comment.objects.filter(post__publish_date__isnull=False)),
         )
 
     owner = Iterator(User.objects.filter(is_superuser=False))
