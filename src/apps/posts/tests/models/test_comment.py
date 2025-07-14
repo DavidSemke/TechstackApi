@@ -26,35 +26,42 @@ class CommentModelTest(TestCase):
             thumbnail="https://fake-url.com/media/thumbnail.webp",
             tags=[self.tag1],
         )
-
         return super().setUp()
 
     def test_post_private(self):
         self.post.publish_date = None
         self.post.save()
 
-        with self.assertRaises(ValidationError) as e:
+        with self.assertRaises(ValidationError) as context:
             posts_factories.CommentFactory(
                 owner=self.user1,
                 post=self.post,
             )
-            self.assertEqual(len(e.messages), 1)
-            self.assertEqual(e.messages[0], "A comment cannot target a private post.")
+
+        error_messages = context.exception.messages
+        self.assertEqual(len(error_messages), 1)
+        self.assertEqual(
+            error_messages[0], "A comment cannot be made on a private post."
+        )
 
     def test_reply_to_self(self):
         comment = posts_factories.CommentFactory(owner=self.user1, post=self.post)
         comment.reply_to = comment
 
-        with self.assertRaises(ValidationError) as e:
+        with self.assertRaises(ValidationError) as context:
             comment.save()
-            self.assertEqual(len(e.messages), 1)
-            self.assertEqual(e.messages[0], "A comment cannot be a reply to itself.")
+
+        error_messages = context.exception.messages
+        self.assertEqual(len(error_messages), 1)
+        self.assertEqual(error_messages[0], "A comment cannot be a reply to itself.")
 
     def test_reply_to_reply(self):
         comment = posts_factories.CommentFactory()
         reply = posts_factories.CommentFactory(reply_to=comment)
 
-        with self.assertRaises(ValidationError) as e:
+        with self.assertRaises(ValidationError) as context:
             posts_factories.CommentFactory(reply_to=reply)
-            self.assertEqual(len(e.messages), 1)
-            self.assertEqual(e.messages[0], "A comment cannot be a reply to a reply.")
+
+        error_messages = context.exception.messages
+        self.assertEqual(len(error_messages), 1)
+        self.assertEqual(error_messages[0], "A comment cannot be a reply to a reply.")
