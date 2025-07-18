@@ -13,7 +13,9 @@ class GroupDetailTest(APITestCase):
         return reverse("group-detail", kwargs={"pk": group_id})
 
     def setUp(self):
-        self.group = Group.objects.create(name="tester")
+        # If the User model is used directly for user creation,
+        # creation of default groups is required (currently only 'commenter').
+        self.group = Group.objects.create(name="commenter")
         self.group_url = self.get_url(self.group.id)
         return super().setUp()
 

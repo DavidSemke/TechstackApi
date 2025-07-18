@@ -7,5 +7,5 @@ from django.dispatch import receiver
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def assign_default_groups(sender, instance, created, **kwargs):
     if created:
-        commenter_group, _ = Group.objects.get_or_create(name="commenter")
+        commenter_group = Group.objects.get(name="commenter")
         instance.groups.add(commenter_group)
