@@ -32,7 +32,9 @@ class ReactionModelTest(TestCase):
         return super().setUp()
 
     def test_constraint_exactly_one_target(self):
-        self.post_reaction.comment = posts_factories.CommentFactory()
+        self.post_reaction.comment = posts_factories.CommentFactory(
+            owner=self.user1, post=self.post
+        )
 
         with self.assertRaises(ValidationError) as context:
             self.post_reaction.save()
