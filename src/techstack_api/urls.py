@@ -34,7 +34,6 @@ root_router.register(r"tags", posts_views.TagViewSet)
 root_router.register(r"posts", posts_views.PostViewSet)
 root_router.register(r"comments", posts_views.CommentViewSet)
 root_router.register(r"reactions", posts_views.ReactionViewSet)
-root_router.register(r"users", core_views.UserViewSet)
 root_router.register(r"groups", core_views.GroupViewSet)
 
 urlpatterns = [
