@@ -1,45 +1,28 @@
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib import admin
 from django.urls import include, path
+from djoser import views
 from rest_framework import routers
 
 import apps.core.views as core_views
 import apps.posts.views as posts_views
 import apps.profiles.views as profiles_views
 
-
-class RootRouter(routers.DefaultRouter):
-    root_viewsets = [
-        profiles_views.ProfileViewSet,
-        posts_views.TagViewSet,
-        posts_views.PostViewSet,
-        posts_views.CommentViewSet,
-        posts_views.ReactionViewSet,
-    ]
-
-    def get_api_root_view(self, api_urls=None):
-        api_root_dict = {}
-        list_name = self.routes[0].name
-
-        for prefix, viewset, basename in self.registry:
-            if viewset in self.root_viewsets:
-                api_root_dict[prefix] = list_name.format(basename=basename)
-
-        return self.APIRootView.as_view(api_root_dict=api_root_dict)
-
-
-root_router = RootRouter()
+root_router = routers.DefaultRouter()
 root_router.register(r"profiles", profiles_views.ProfileViewSet)
 root_router.register(r"tags", posts_views.TagViewSet)
 root_router.register(r"posts", posts_views.PostViewSet)
 root_router.register(r"comments", posts_views.CommentViewSet)
 root_router.register(r"reactions", posts_views.ReactionViewSet)
-root_router.register(r"groups", core_views.GroupViewSet)
+
+auth_router = routers.DefaultRouter()
+auth_router.register(r"users", views.UserViewSet)
+auth_router.register(r"groups", core_views.GroupViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("api/v1/", include(root_router.urls)),
-    path("api/auth/", include("djoser.urls")),
+    path("api/auth/", include(auth_router.urls)),
     path("api/auth/", include("djoser.urls.jwt")),
 ] + debug_toolbar_urls()
