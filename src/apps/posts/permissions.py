@@ -9,8 +9,3 @@ class IsAuthor(perms.BasePermission):
 class IsCommenter(perms.BasePermission):
     def has_permission(self, request, view):
         return request.user and request.user.groups.filter(name="commenter").exists()
-
-
-class IsModerator(perms.BasePermission):
-    def has_permission(self, request, view):
-        return request.user and request.user.groups.filter(name="moderator").exists()

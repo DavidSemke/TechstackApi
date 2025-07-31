@@ -176,3 +176,12 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ]
 }
+
+DJOSER = {
+    "USER_ID_FIELD": "pk",
+    "TOKEN_MODEL": None,
+    "SERIALIZERS": {
+        "user": "apps.core.serializers.auth.UserSerializer",
+        "current_user": "apps.core.serializers.auth.UserSerializer",
+    },
+}

@@ -1,19 +1,21 @@
 from django.contrib.auth.models import Group, User
+from djoser.serializers import UserSerializer
+from rest_framework import serializers as serials
 
-from . import base as base_serials
+from .mixins import DynamicFieldsMixin
 
 
-class UserSerializer(base_serials.HyperlinkedReprnModelSerializer):
+class UserSerializer(DynamicFieldsMixin, UserSerializer):
+    groups = serials.SlugRelatedField(
+        many=True, queryset=Group.objects.all(), slug_field="name"
+    )
+
     class Meta:
         model = User
-        fields = ["url", "username", "email", "groups"]
+        fields = ["id", "username", "email", "groups"]
 
 
-# Group ideas:
-# 1 - Author (able to create/edit/delete their posts)
-# 2 - Commenter (able to create/edit/delete their comments)
-# 3 - Moderator (able to delete/edit content, remove Author/Commenter permissions)
-class GroupSerializer(base_serials.HyperlinkedReprnModelSerializer):
+class GroupSerializer(serials.ModelSerializer):
     class Meta:
         model = Group
-        fields = ["url", "name"]
+        fields = ["id", "name"]

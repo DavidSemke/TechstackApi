@@ -1,7 +1,6 @@
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib import admin
 from django.urls import include, path
-from djoser import views
 from rest_framework import routers
 
 import apps.core.views as core_views
@@ -16,7 +15,7 @@ root_router.register(r"comments", posts_views.CommentViewSet)
 root_router.register(r"reactions", posts_views.ReactionViewSet)
 
 auth_router = routers.DefaultRouter()
-auth_router.register(r"users", views.UserViewSet)
+auth_router.register(r"users", core_views.UserViewSet)
 auth_router.register(r"groups", core_views.GroupViewSet)
 
 urlpatterns = [

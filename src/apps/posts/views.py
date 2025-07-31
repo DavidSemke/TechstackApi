@@ -21,7 +21,7 @@ class TagViewSet(viewsets.ModelViewSet):
         if self.action == "create":
             self.permission_classes += [app_perms.IsAuthor]
         elif self.action in ("update", "partial_update", "destroy"):
-            self.permission_classes += [app_perms.IsModerator]
+            self.permission_classes += [core_perms.IsModerator]
 
         return super().get_permissions()
 
@@ -41,7 +41,7 @@ class PostViewSet(viewsets.ModelViewSet):
             self.permission_classes += [app_perms.IsAuthor]
         elif self.action in ("update", "partial_update", "destroy"):
             self.permission_classes += [
-                (app_perms.IsAuthor & core_perms.IsOwner) | app_perms.IsModerator
+                (app_perms.IsAuthor & core_perms.IsOwner) | core_perms.IsModerator
             ]
 
         return super().get_permissions()
@@ -74,7 +74,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             self.permission_classes += [app_perms.IsCommenter]
         elif self.action in ("update", "partial_update", "destroy"):
             self.permission_classes += [
-                (app_perms.IsCommenter & core_perms.IsOwner) | app_perms.IsModerator
+                (app_perms.IsCommenter & core_perms.IsOwner) | core_perms.IsModerator
             ]
 
         return super().get_permissions()
