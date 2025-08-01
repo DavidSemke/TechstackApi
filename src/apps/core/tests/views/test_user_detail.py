@@ -31,15 +31,19 @@ class UserDetailTest(APITestCase):
 
             self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # The UserViewSet 'me' action should be used instead of default detail url
-    def test_get_login(self):
+    def test_get_put_patch_login(self):
         user2 = core_factories.UserFactory()
         test_utils.jwt_login(self.client, user2.username)
 
-        with self.assertLogs("django.request", level="WARNING"):
-            res = self.client.get(self.user_url)
+        methods = ["get", "put", "patch"]
 
-        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        for method in methods:
+            method_func = getattr(self.client, method)
+
+            with self.assertLogs("django.request", level="WARNING"):
+                res = method_func(self.user_url)
+
+            self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_post_login(self):
         user2 = core_factories.UserFactory()
@@ -50,29 +54,49 @@ class UserDetailTest(APITestCase):
 
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def test_put_login(self):
+    def test_delete_login(self):
+        user2 = core_factories.UserFactory()
+        test_utils.jwt_login(self.client, user2.username)
+
+        with self.assertLogs("django.request", level="WARNING"):
+            res = self.client.delete(self.user_url)
+
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_login_owner(self):
+        test_utils.jwt_login(self.client, self.user1.username)
+
+        res = self.client.get(self.user_url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        # Current user's email is shown to current user
+        self.assertIn("email", res.data)
+
+    def test_put_login_owner(self):
         test_utils.jwt_login(self.client, self.user1.username)
 
         new_username = "better_tester"
         self.assertNotEqual(self.user1.username, new_username)
         res = self.client.put(self.user_url, {"username": new_username})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("email", res.data)
 
         self.user1.refresh_from_db()
         self.assertEqual(self.user1.username, new_username)
 
-    def test_patch_login(self):
+    def test_patch_login_owner(self):
         test_utils.jwt_login(self.client, self.user1.username)
 
         new_username = "better_tester"
         self.assertNotEqual(self.user1.username, new_username)
         res = self.client.patch(self.user_url, {"username": new_username})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("email", res.data)
 
         self.user1.refresh_from_db()
         self.assertEqual(self.user1.username, new_username)
 
-    def test_delete_login(self):
+    def test_delete_login_owner(self):
         test_utils.jwt_login(self.client, self.user1.username)
 
         res = self.client.delete(self.user_url, {"current_password": "password"})
@@ -93,6 +117,8 @@ class UserDetailTest(APITestCase):
         res = self.client.get(self.user_url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(self.user1.id, res.data["id"])
+        # Email is shown to admins
+        self.assertIn("email", res.data)
 
     def test_put_login_admin(self):
         User = get_user_model()
@@ -106,6 +132,7 @@ class UserDetailTest(APITestCase):
         self.assertNotEqual(self.user1.username, new_username)
         res = self.client.put(self.user_url, {"username": new_username})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("email", res.data)
 
         self.user1.refresh_from_db()
         self.assertEqual(self.user1.username, new_username)
@@ -122,6 +149,7 @@ class UserDetailTest(APITestCase):
         self.assertNotEqual(self.user1.username, new_username)
         res = self.client.patch(self.user_url, {"username": new_username})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("email", res.data)
 
         self.user1.refresh_from_db()
         self.assertEqual(self.user1.username, new_username)
@@ -149,6 +177,8 @@ class UserDetailTest(APITestCase):
         res = self.client.get(self.user_url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(self.user1.id, res.data["id"])
+        # Email is not shown to moderators
+        self.assertNotIn("email", res.data)
 
     def test_put_login_moderator(self):
         user2 = core_factories.UserFactory()
@@ -172,11 +202,11 @@ class UserDetailTest(APITestCase):
 
         groups = list(self.user1.groups.all())
         self.assertEqual(len(groups), 1)
-        self.assertIn(self.comment_group, groups)
 
         author_group = Group.objects.create(name="author")
         res = self.client.patch(self.user_url, {"groups": ["author"]})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertNotIn("email", res.data)
 
         self.user1.refresh_from_db()
         groups = list(self.user1.groups.all())

@@ -6,6 +6,11 @@ class ReadOnly(perms.BasePermission):
         return request.method in perms.SAFE_METHODS
 
 
+class IsCurrentUser(perms.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj == request.user
+
+
 class IsOwner(perms.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.owner == request.user

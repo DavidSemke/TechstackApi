@@ -4,11 +4,15 @@ from djoser.conf import settings
 from rest_framework import permissions, viewsets
 
 from . import permissions as core_perms
-from .serializers.auth import GroupSerializer
+from .serializers.auth import GroupSerializer, UserSerializer
 
 
 # This viewset is needed to allow moderators to manage author and commenter groups
 class UserViewSet(views.UserViewSet):
+    def initial(self, request, *args, **kwargs):
+        self.user_groups = list(request.user.groups.values_list("name", flat=True))
+        return super().initial(request, *args, **kwargs)
+
     def get_permissions(self):
         if self.action == "create":
             self.permission_classes = settings.PERMISSIONS.user_create
@@ -35,13 +39,39 @@ class UserViewSet(views.UserViewSet):
         ):
             self.permission_classes = settings.PERMISSIONS.user_delete
         elif self.action == "retrieve":
-            self.permission_classes = [core_perms.IsModerator | permissions.IsAdminUser]
+            self.permission_classes = [
+                core_perms.IsCurrentUser
+                | core_perms.IsModerator
+                | permissions.IsAdminUser
+            ]
         elif self.action == "partial_update":
             self.permission_classes = [
-                core_perms.IsGroupModerator | permissions.IsAdminUser
+                core_perms.IsCurrentUser
+                | core_perms.IsGroupModerator
+                | permissions.IsAdminUser
             ]
 
         return super(views.UserViewSet, self).get_permissions()
+
+    def get_serializer(self, *args, **kwargs):
+        if (
+            self.get_serializer_class() is not UserSerializer
+            or self.request.user.is_staff
+        ):
+            return super().get_serializer(*args, **kwargs)
+
+        isCurrentUser = False
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+
+        if self.action == "me" or lookup_url_kwarg in self.kwargs:
+            target_user = self.get_object()
+            isCurrentUser = target_user == self.request.user
+
+        if not isCurrentUser:
+            # Exclude email
+            kwargs["fields"] = ["id", "username", "groups"]
+
+        return super().get_serializer(*args, **kwargs)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
