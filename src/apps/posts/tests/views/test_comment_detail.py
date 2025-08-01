@@ -187,3 +187,43 @@ class CommentDetailTest(APITestCase):
                 res = method_func(self.comment_url)
 
             self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_put_login_moderator(self):
+        user2 = core_factories.UserFactory()
+        mod_group = Group.objects.create(name="moderator")
+        user2.groups.add(mod_group)
+        test_utils.jwt_login(self.client, user2.username)
+
+        new_content = "content"
+        self.assertNotEqual(new_content, self.comment.content)
+        res = self.client.put(self.comment_url, {"content": new_content})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        self.comment.refresh_from_db()
+        self.assertEqual(new_content, self.comment.content)
+
+    def test_patch_login_moderator(self):
+        user2 = core_factories.UserFactory()
+        mod_group = Group.objects.create(name="moderator")
+        user2.groups.add(mod_group)
+        test_utils.jwt_login(self.client, user2.username)
+
+        new_content = "content"
+        self.assertNotEqual(new_content, self.comment.content)
+        res = self.client.patch(self.comment_url, {"content": new_content})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        self.comment.refresh_from_db()
+        self.assertEqual(new_content, self.comment.content)
+
+    def test_delete_login_moderator(self):
+        user2 = core_factories.UserFactory()
+        mod_group = Group.objects.create(name="moderator")
+        user2.groups.add(mod_group)
+        test_utils.jwt_login(self.client, user2.username)
+
+        res = self.client.delete(self.comment_url)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+        with self.assertRaises(posts_models.Comment.DoesNotExist):
+            self.comment.refresh_from_db()
