@@ -3,6 +3,7 @@ from rest_framework import permissions as perms
 from rest_framework import viewsets
 
 from ..core import permissions as core_perms
+from . import filters as app_filters
 from . import models as app_models
 from . import permissions as app_perms
 from . import serializers as app_serials
@@ -12,6 +13,7 @@ from . import serializers as app_serials
 class TagViewSet(viewsets.ModelViewSet):
     queryset = app_models.Tag.objects.all().order_by("title")
     serializer_class = app_serials.TagSerializer
+    filterset_class = app_filters.TagFilter
 
     # An author can create.
     # A moderator can update/delete.
@@ -30,6 +32,7 @@ class TagViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = app_models.Post.objects.all().order_by("title", "-publish_date")
     serializer_class = app_serials.PostSerializer
+    filterset_class = app_filters.PostFilter
 
     # An author can create.
     # An author that owns the post can update/delete.
@@ -63,6 +66,7 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = app_models.Comment.objects.all().order_by("post", "-create_date")
     serializer_class = app_serials.CommentSerializer
+    filterset_class = app_filters.CommentFilter
 
     # A commenter can create.
     # A commenter that owns the comment can update/delete.
@@ -99,6 +103,7 @@ class ReactionViewSet(viewsets.ModelViewSet):
         "owner__username", "-create_date"
     )
     serializer_class = app_serials.ReactionSerializer
+    filterset_class = app_filters.ReactionFilter
 
     def get_permissions(self):
         self.permission_classes = [perms.IsAuthenticatedOrReadOnly]
