@@ -7,11 +7,10 @@ from ... import model_factories as posts_factories
 
 class TagModelTest(TestCase):
     def test_constraint_lowercase_title(self):
-        try:
+        with self.assertRaises(IntegrityError) as context:
             posts_factories.TagFactory(title="UPPERCASE")
-            self.fail("Integrity error not raised.")
-        except IntegrityError as e:
-            self.assertIn("lowercase_title", str(e))
+
+        self.assertIn("lowercase_title", str(context.exception))
 
     def test_title_regex(self):
         # Valid title
@@ -19,13 +18,13 @@ class TagModelTest(TestCase):
         tag1.full_clean()
 
         # Invalid title
-        try:
+        with self.assertRaises(ValidationError) as context:
             tag2 = posts_factories.TagFactory(title="axe(40-salad)")
             tag2.full_clean()
-            self.fail("Validation error not raised.")
-        except ValidationError as e:
-            self.assertEqual(len(e.messages), 1)
-            self.assertEqual(
-                e.messages[0],
-                "Tag title must only contain letters, numbers, and hyphens.",
-            )
+
+        error_messages = context.exception.messages
+        self.assertEqual(len(error_messages), 1)
+        self.assertEqual(
+            error_messages[0],
+            "Tag title must only contain letters, numbers, and hyphens.",
+        )

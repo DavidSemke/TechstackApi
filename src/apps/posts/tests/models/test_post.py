@@ -32,39 +32,39 @@ class PostModelTest(TestCase):
     def test_thumbnail_empty_on_publish(self):
         self.post.thumbnail = ""
 
-        try:
+        with self.assertRaises(ValidationError) as context:
             self.post.save()
-            self.fail("Validation error not raised.")
-        except ValidationError as e:
-            self.assertEqual(len(e.messages), 1)
-            self.assertEqual(e.messages[0], "A published post must have a thumbnail.")
+
+        error_messages = context.exception.messages
+        self.assertEqual(len(error_messages), 1)
+        self.assertEqual(error_messages[0], "A published post must have a thumbnail.")
 
     def test_content_empty_on_publish(self):
         self.post.content = ""
 
-        try:
+        with self.assertRaises(ValidationError) as context:
             self.post.save()
-            self.fail("Validation error not raised.")
-        except ValidationError as e:
-            self.assertEqual(len(e.messages), 1)
-            self.assertEqual(e.messages[0], "A published post must have content.")
+
+        error_messages = context.exception.messages
+        self.assertEqual(len(error_messages), 1)
+        self.assertEqual(error_messages[0], "A published post must have content.")
 
     def test_tags_too_few_on_publish(self):
-        try:
+        with self.assertRaises(ValidationError) as context:
             self.post.tags.remove(self.tag1)
-            self.fail("Validation error not raised.")
-        except ValidationError as e:
-            self.assertEqual(len(e.messages), 1)
-            self.assertEqual(
-                e.messages[0], "A published post must have at least 1 tag(s)."
-            )
+
+        error_messages = context.exception.messages
+        self.assertEqual(len(error_messages), 1)
+        self.assertEqual(
+            error_messages[0], "A published post must have at least 1 tag(s)."
+        )
 
     def test_tags_too_many(self):
         new_tags = [posts_factories.TagFactory() for _ in range(5)]
 
-        try:
+        with self.assertRaises(ValidationError) as context:
             self.post.tags.add(*new_tags)
-            self.fail("Validation error not raised.")
-        except ValidationError as e:
-            self.assertEqual(len(e.messages), 1)
-            self.assertEqual(e.messages[0], "A post must have at most 5 tag(s).")
+
+        error_messages = context.exception.messages
+        self.assertEqual(len(error_messages), 1)
+        self.assertEqual(error_messages[0], "A post must have at most 5 tag(s).")
