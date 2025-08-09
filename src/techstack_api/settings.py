@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "djoser",
     "django_filters",
+    "silk",
     # My apps
     "apps.commando",
     "apps.core",
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "silk.middleware.SilkyMiddleware",
 ]
 
 TESTING = "test" in sys.argv

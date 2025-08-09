@@ -362,6 +362,25 @@ files = [
 Django = ">=4.2"
 
 [[package]]
+name = "django-silk"
+version = "5.4.0"
+description = "Silky smooth profiling for the Django Framework"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "django_silk-5.4.0-py3-none-any.whl", hash = "sha256:caf720a06e24a6cf1acf825c1868b2a6ece8158b13725363f6d3a1a9994d0fa6"},
+    {file = "django_silk-5.4.0.tar.gz", hash = "sha256:2247870ac8080b6c6c5db17f2f1042d39d95e4a5fa061d661882777ec9adb672"},
+]
+
+[package.dependencies]
+Django = ">=4.2"
+gprof2dot = ">=2017.09.19"
+sqlparse = "*"
+
+[package.extras]
+formatting = ["autopep8"]
+
+[[package]]
 name = "djangorestframework"
 version = "3.16.0"
 description = "Web APIs for Django, made easy."
@@ -466,6 +485,17 @@ files = [
 docs = ["furo (>=2024.8.6)", "sphinx (>=8.1.3)", "sphinx-autodoc-typehints (>=3)"]
 testing = ["covdefaults (>=2.3)", "coverage (>=7.6.10)", "diff-cover (>=9.2.1)", "pytest (>=8.3.4)", "pytest-asyncio (>=0.25.2)", "pytest-cov (>=6)", "pytest-mock (>=3.14)", "pytest-timeout (>=2.3.1)", "virtualenv (>=20.28.1)"]
 typing = ["typing-extensions (>=4.12.2)"]
+
+[[package]]
+name = "gprof2dot"
+version = "2025.4.14"
+description = "Generate a dot graph from the output of several profilers."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "gprof2dot-2025.4.14-py3-none-any.whl", hash = "sha256:0742e4c0b4409a5e8777e739388a11e1ed3750be86895655312ea7c20bd0090e"},
+    {file = "gprof2dot-2025.4.14.tar.gz", hash = "sha256:35743e2d2ca027bf48fa7cba37021aaf4a27beeae1ae8e05a50b55f1f921a6ce"},
+]
 
 [[package]]
 name = "identify"
@@ -1004,4 +1034,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "e3a8429c63f4e01d2aba9b4b80da04a41d658cc4900458abcbff31b2de879bb6"
+content-hash = "b94fee37e4601b1babc7d19b70750e1484adacab09004b20303876f26751a82d"

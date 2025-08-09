@@ -24,4 +24,5 @@ urlpatterns = [
     path("api/v1/", include(root_router.urls)),
     path("api/auth/", include(auth_router.urls)),
     path("api/auth/", include("djoser.urls.jwt")),
+    path("silk/", include("silk.urls", namespace="silk")),
 ] + debug_toolbar_urls()
