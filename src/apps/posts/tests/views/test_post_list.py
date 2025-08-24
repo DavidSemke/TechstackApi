@@ -44,8 +44,8 @@ class PostListTest(APITestCase):
         res = self.client.get(self.url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         # Private post hidden, public visible
-        self.assertEqual(len(res.data), 1)
-        post_id = test_utils.last_url_pk(res.data[0]["url"])
+        self.assertEqual(len(res.data["results"]), 1)
+        post_id = test_utils.last_url_pk(res.data["results"][0]["url"])
         self.assertEqual(self.public_post.id, post_id)
 
     def test_post_put_patch_delete_guest(self):
@@ -66,15 +66,15 @@ class PostListTest(APITestCase):
 
         res = self.client.get(self.url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), 2)
+        self.assertEqual(len(res.data["results"]), 2)
 
         # Second, user1 that owns public post
         test_utils.jwt_login(self.client, self.user1.username)
         res = self.client.get(self.url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), 1)
+        self.assertEqual(len(res.data["results"]), 1)
 
-        post_id = test_utils.last_url_pk(res.data[0]["url"])
+        post_id = test_utils.last_url_pk(res.data["results"][0]["url"])
         self.assertEqual(self.public_post.id, post_id)
 
     def test_post_login(self):

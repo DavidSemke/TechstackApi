@@ -21,8 +21,8 @@ class TagListTest(APITestCase):
     def test_get_guest(self):
         res = self.client.get(self.url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), 1)
-        tag_id = test_utils.last_url_pk(res.data[0]["url"])
+        self.assertEqual(len(res.data["results"]), 1)
+        tag_id = test_utils.last_url_pk(res.data["results"][0]["url"])
         self.assertEqual(self.tag.id, tag_id)
 
     def test_post_put_patch_delete_guest(self):
