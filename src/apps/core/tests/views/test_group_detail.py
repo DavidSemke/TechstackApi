@@ -63,7 +63,7 @@ class GroupDetailTest(APITestCase):
 
         res = self.client.get(self.group_url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        group_id = test_utils.last_url_pk(res.data["url"])
+        group_id = res.data["id"]
         self.assertEqual(self.group.id, group_id)
 
     def test_post_login_admin(self):
