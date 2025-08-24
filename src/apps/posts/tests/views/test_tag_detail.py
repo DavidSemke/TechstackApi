@@ -21,44 +21,44 @@ class TagDetailTest(APITestCase):
         self.tag_url = self.get_url(self.tag.id)
         return super().setUp()
 
-    # def test_get_guest(self):
-    #     res = self.client.get(self.tag_url)
-    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
-    #     tag_id = test_utils.last_url_pk(res.data["url"])
-    #     self.assertEqual(self.tag.id, tag_id)
+    def test_get_guest(self):
+        res = self.client.get(self.tag_url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        tag_id = test_utils.last_url_pk(res.data["url"])
+        self.assertEqual(self.tag.id, tag_id)
 
-    # def test_post_put_patch_delete_guest(self):
-    #     methods = ["post", "put", "patch", "delete"]
+    def test_post_put_patch_delete_guest(self):
+        methods = ["post", "put", "patch", "delete"]
 
-    #     for method in methods:
-    #         method_func = getattr(self.client, method)
+        for method in methods:
+            method_func = getattr(self.client, method)
 
-    #         with self.assertLogs("django.request", level="WARNING"):
-    #             res = method_func(self.tag_url)
+            with self.assertLogs("django.request", level="WARNING"):
+                res = method_func(self.tag_url)
 
-    #         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # def test_post_login(self):
-    #     test_utils.jwt_login(self.client, self.user1.username)
+    def test_post_login(self):
+        test_utils.jwt_login(self.client, self.user1.username)
 
-    #     with self.assertLogs("django.request", level="WARNING"):
-    #         res = self.client.post(self.tag_url)
+        with self.assertLogs("django.request", level="WARNING"):
+            res = self.client.post(self.tag_url)
 
-    #     self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    # def test_put_patch_delete_login(self):
-    #     user2 = core_factories.UserFactory()
-    #     test_utils.jwt_login(self.client, user2.username)
+    def test_put_patch_delete_login(self):
+        user2 = core_factories.UserFactory()
+        test_utils.jwt_login(self.client, user2.username)
 
-    #     methods = ["put", "patch", "delete"]
+        methods = ["put", "patch", "delete"]
 
-    #     for method in methods:
-    #         method_func = getattr(self.client, method)
+        for method in methods:
+            method_func = getattr(self.client, method)
 
-    #         with self.assertLogs("django.request", level="WARNING"):
-    #             res = method_func(self.tag_url)
+            with self.assertLogs("django.request", level="WARNING"):
+                res = method_func(self.tag_url)
 
-    #         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+            self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_put_login_moderator(self):
         user2 = core_factories.UserFactory()

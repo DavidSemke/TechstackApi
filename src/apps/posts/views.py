@@ -30,7 +30,12 @@ class TagViewSet(viewsets.ModelViewSet):
 
 # View/edit posts
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = app_models.Post.objects.all().order_by("title", "-publish_date")
+    queryset = (
+        app_models.Post.objects.select_related("owner")
+        .prefetch_related("tags")
+        .prefetch_related("comments")
+        .order_by("title", "-publish_date")
+    )
     serializer_class = app_serials.PostSerializer
     filterset_class = app_filters.PostFilter
 
@@ -55,7 +60,25 @@ class PostViewSet(viewsets.ModelViewSet):
         if self.request.user.is_authenticated:
             filter |= models.Q(owner=self.request.user)
 
-        return super().get_queryset().filter(filter)
+        return (
+            super()
+            .get_queryset()
+            .filter(filter)
+            .annotate(
+                like_count=models.Count(
+                    "reactions",
+                    filter=models.Q(
+                        reactions__type=app_models.Reaction.ReactionType.LIKE
+                    ),
+                ),
+                dislike_count=models.Count(
+                    "reactions",
+                    filter=models.Q(
+                        reactions__type=app_models.Reaction.ReactionType.DISLIKE
+                    ),
+                ),
+            )
+        )
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -64,7 +87,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
 # View/edit comments
 class CommentViewSet(viewsets.ModelViewSet):
-    queryset = app_models.Comment.objects.all().order_by("post", "-create_date")
+    queryset = app_models.Comment.objects.select_related("owner").order_by(
+        "post", "-create_date"
+    )
     serializer_class = app_serials.CommentSerializer
     filterset_class = app_filters.CommentFilter
 
@@ -90,7 +115,25 @@ class CommentViewSet(viewsets.ModelViewSet):
             filter |= models.Q(owner=self.request.user)
             filter |= models.Q(post__owner=self.request.user)
 
-        return super().get_queryset().filter(filter)
+        return (
+            super()
+            .get_queryset()
+            .filter(filter)
+            .annotate(
+                like_count=models.Count(
+                    "reactions",
+                    filter=models.Q(
+                        reactions__type=app_models.Reaction.ReactionType.LIKE
+                    ),
+                ),
+                dislike_count=models.Count(
+                    "reactions",
+                    filter=models.Q(
+                        reactions__type=app_models.Reaction.ReactionType.DISLIKE
+                    ),
+                ),
+            )
+        )
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

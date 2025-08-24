@@ -13,12 +13,11 @@ class TagSerializer(base_serials.HyperlinkedReprnModelSerializer):
 
 class PostSerializer(base_serials.HyperlinkedReprnModelSerializer):
     owner = serials.ReadOnlyField(source="owner.username")
-    publish_date = serials.ReadOnlyField()
+    like_count = serials.IntegerField(read_only=True)
+    dislike_count = serials.IntegerField(read_only=True)
     tags = serials.SlugRelatedField(
         many=True, slug_field="title", queryset=app_models.Tag.objects.all()
     )
-    like_count = serials.SerializerMethodField()
-    dislike_count = serials.SerializerMethodField()
 
     class Meta:
         model = app_models.Post
@@ -37,23 +36,13 @@ class PostSerializer(base_serials.HyperlinkedReprnModelSerializer):
         ]
         read_only_fields = ["publish_date"]
 
-    def get_like_count(self, obj):
-        return app_models.Reaction.objects.filter(
-            type=app_models.Reaction.ReactionType.LIKE, post=obj
-        ).count()
-
-    def get_dislike_count(self, obj):
-        return app_models.Reaction.objects.filter(
-            type=app_models.Reaction.ReactionType.DISLIKE, post=obj
-        ).count()
-
 
 class CommentSerializer(
     serial_mixins.ImmutableFieldsMixin, base_serials.HyperlinkedReprnModelSerializer
 ):
     owner = serials.ReadOnlyField(source="owner.username")
-    like_count = serials.SerializerMethodField()
-    dislike_count = serials.SerializerMethodField()
+    like_count = serials.IntegerField(read_only=True)
+    dislike_count = serials.IntegerField(read_only=True)
 
     class Meta:
         model = app_models.Comment
@@ -68,16 +57,6 @@ class CommentSerializer(
             "dislike_count",
         ]
         immutable_fields = ["post", "reply_to"]
-
-    def get_like_count(self, obj):
-        return app_models.Reaction.objects.filter(
-            type=app_models.Reaction.ReactionType.LIKE, comment=obj
-        ).count()
-
-    def get_dislike_count(self, obj):
-        return app_models.Reaction.objects.filter(
-            type=app_models.Reaction.ReactionType.DISLIKE, comment=obj
-        ).count()
 
 
 class ReactionSerializer(base_serials.HyperlinkedReprnModelSerializer):

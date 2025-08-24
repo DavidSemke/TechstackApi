@@ -38,130 +38,130 @@ class PostDetailTest(APITestCase):
         self.public_url = self.get_url(self.public_post.id)
         return super().setUp()
 
-    # def test_get_guest_public_post(self):
-    #     res = self.client.get(self.public_url)
-    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
-    #     post_id = test_utils.last_url_pk(res.data["url"])
-    #     self.assertEqual(self.public_post.id, post_id)
+    def test_get_guest_public_post(self):
+        res = self.client.get(self.public_url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        post_id = test_utils.last_url_pk(res.data["url"])
+        self.assertEqual(self.public_post.id, post_id)
 
-    # def test_get_guest_private_post(self):
-    #     private_post = posts_factories.PostFactory(
-    #         owner=self.user1, thumbnail="", publish_date=None
-    #     )
+    def test_get_guest_private_post(self):
+        private_post = posts_factories.PostFactory(
+            owner=self.user1, thumbnail="", publish_date=None
+        )
 
-    #     with self.assertLogs("django.request", level="WARNING"):
-    #         res = self.client.get(self.get_url(private_post.id))
+        with self.assertLogs("django.request", level="WARNING"):
+            res = self.client.get(self.get_url(private_post.id))
 
-    #     self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
-    # def test_post_put_patch_delete_guest(self):
-    #     methods = ["post", "put", "patch", "delete"]
+    def test_post_put_patch_delete_guest(self):
+        methods = ["post", "put", "patch", "delete"]
 
-    #     for method in methods:
-    #         method_func = getattr(self.client, method)
+        for method in methods:
+            method_func = getattr(self.client, method)
 
-    #         with self.assertLogs("django.request", level="WARNING"):
-    #             res = method_func(self.public_url)
+            with self.assertLogs("django.request", level="WARNING"):
+                res = method_func(self.public_url)
 
-    #         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # def test_get_login_private_post(self):
-    #     user2 = core_factories.UserFactory()
-    #     user2.groups.add(self.author_group)
-    #     test_utils.jwt_login(self.client, user2.username)
-    #     private_post = posts_factories.PostFactory(
-    #         owner=self.user1, thumbnail="", publish_date=None
-    #     )
+    def test_get_login_private_post(self):
+        user2 = core_factories.UserFactory()
+        user2.groups.add(self.author_group)
+        test_utils.jwt_login(self.client, user2.username)
+        private_post = posts_factories.PostFactory(
+            owner=self.user1, thumbnail="", publish_date=None
+        )
 
-    #     with self.assertLogs("django.request", level="WARNING"):
-    #         res = self.client.get(self.get_url(private_post.id))
+        with self.assertLogs("django.request", level="WARNING"):
+            res = self.client.get(self.get_url(private_post.id))
 
-    #     self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
-    # def test_post_login(self):
-    #     test_utils.jwt_login(self.client, self.user1.username)
+    def test_post_login(self):
+        test_utils.jwt_login(self.client, self.user1.username)
 
-    #     with self.assertLogs("django.request", level="WARNING"):
-    #         res = self.client.post(self.public_url)
+        with self.assertLogs("django.request", level="WARNING"):
+            res = self.client.post(self.public_url)
 
-    #     self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    # def test_put_patch_delete_login_public_post(self):
-    #     user2 = core_factories.UserFactory()
-    #     user2.groups.add(self.author_group)
-    #     test_utils.jwt_login(self.client, user2.username)
+    def test_put_patch_delete_login_public_post(self):
+        user2 = core_factories.UserFactory()
+        user2.groups.add(self.author_group)
+        test_utils.jwt_login(self.client, user2.username)
 
-    #     methods = ["put", "patch", "delete"]
+        methods = ["put", "patch", "delete"]
 
-    #     for method in methods:
-    #         method_func = getattr(self.client, method)
+        for method in methods:
+            method_func = getattr(self.client, method)
 
-    #         with self.assertLogs("django.request", level="WARNING"):
-    #             res = method_func(self.public_url)
+            with self.assertLogs("django.request", level="WARNING"):
+                res = method_func(self.public_url)
 
-    #         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+            self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
-    # def test_get_login_private_post_owner(self):
-    #     test_utils.jwt_login(self.client, self.user1.username)
-    #     private_post = posts_factories.PostFactory(
-    #         owner=self.user1, thumbnail="", publish_date=None
-    #     )
+    def test_get_login_private_post_owner(self):
+        test_utils.jwt_login(self.client, self.user1.username)
+        private_post = posts_factories.PostFactory(
+            owner=self.user1, thumbnail="", publish_date=None
+        )
 
-    #     res = self.client.get(self.get_url(private_post.id))
-    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.get(self.get_url(private_post.id))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-    # def test_put_login_public_post_owner(self):
-    #     test_utils.jwt_login(self.client, self.user1.username)
+    def test_put_login_public_post_owner(self):
+        test_utils.jwt_login(self.client, self.user1.username)
 
-    #     new_title = "This title is at least min length"
-    #     self.assertNotEqual(self.public_post.title, new_title)
+        new_title = "This title is at least min length"
+        self.assertNotEqual(self.public_post.title, new_title)
 
-    #     res = self.client.put(
-    #         self.public_url,
-    #         {"title": new_title, "tags": self.tags},
-    #     )
-    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.put(
+            self.public_url,
+            {"title": new_title, "tags": self.tags},
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-    #     self.public_post.refresh_from_db()
-    #     self.assertEqual(self.public_post.title, new_title)
+        self.public_post.refresh_from_db()
+        self.assertEqual(self.public_post.title, new_title)
 
-    # def test_patch_login_public_post_owner(self):
-    #     test_utils.jwt_login(self.client, self.user1.username)
+    def test_patch_login_public_post_owner(self):
+        test_utils.jwt_login(self.client, self.user1.username)
 
-    #     new_title = "This title is at least min length"
-    #     self.assertNotEqual(self.public_post.title, new_title)
+        new_title = "This title is at least min length"
+        self.assertNotEqual(self.public_post.title, new_title)
 
-    #     res = self.client.patch(
-    #         self.public_url,
-    #         {"title": new_title},
-    #     )
-    #     self.assertEqual(res.status_code, status.HTTP_200_OK)
+        res = self.client.patch(
+            self.public_url,
+            {"title": new_title},
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-    #     self.public_post.refresh_from_db()
-    #     self.assertEqual(self.public_post.title, new_title)
+        self.public_post.refresh_from_db()
+        self.assertEqual(self.public_post.title, new_title)
 
-    # def test_delete_login_public_post_owner(self):
-    #     test_utils.jwt_login(self.client, self.user1.username)
+    def test_delete_login_public_post_owner(self):
+        test_utils.jwt_login(self.client, self.user1.username)
 
-    #     res = self.client.delete(self.public_url)
-    #     self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        res = self.client.delete(self.public_url)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
-    #     with self.assertRaises(posts_models.Post.DoesNotExist):
-    #         self.public_post.refresh_from_db()
+        with self.assertRaises(posts_models.Post.DoesNotExist):
+            self.public_post.refresh_from_db()
 
-    # def test_put_patch_delete_login_public_post_owner_not_author(self):
-    #     self.user1.groups.remove(self.author_group)
-    #     test_utils.jwt_login(self.client, self.user1.username)
+    def test_put_patch_delete_login_public_post_owner_not_author(self):
+        self.user1.groups.remove(self.author_group)
+        test_utils.jwt_login(self.client, self.user1.username)
 
-    #     methods = ["put", "patch", "delete"]
+        methods = ["put", "patch", "delete"]
 
-    #     for method in methods:
-    #         method_func = getattr(self.client, method)
+        for method in methods:
+            method_func = getattr(self.client, method)
 
-    #         with self.assertLogs("django.request", level="WARNING"):
-    #             res = method_func(self.public_url)
+            with self.assertLogs("django.request", level="WARNING"):
+                res = method_func(self.public_url)
 
-    #         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+            self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_put_login_moderator(self):
         user2 = core_factories.UserFactory()
