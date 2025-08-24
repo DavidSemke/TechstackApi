@@ -142,7 +142,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 # View/edit reactions
 class ReactionViewSet(viewsets.ModelViewSet):
-    queryset = app_models.Reaction.objects.all().order_by(
+    queryset = app_models.Reaction.objects.select_related("owner").order_by(
         "owner__username", "-create_date"
     )
     serializer_class = app_serials.ReactionSerializer
